@@ -35,40 +35,36 @@ module ACTOR-SYNTAX
                 | "t"
 		| "nil"
 
-  syntax Op   ::= "isatom"
-                | "isnat"
-		| "ispr"
-		| "br"
-		| "pr"
-		| "fst"
-		| "snd"
-		| "newadr"
-		| "initbeh"
-		| "send"
-		| "become"
-
   syntax Val  ::= Atom
                 | Id
                 | "\\" Id "." Exp [binder]
 	        | pr(Val, Val)
 
-  syntax Exp  ::= Atom
-                | Id
-	        | "\\" Id "." Exp [binder]
-	        | app(Exp, Exp)
-	        | Op "(" Exps ")"
-  
-  syntax Cxt  ::= Atom
-                | Id
-	        | "\\" Id "." Cxt [binder]
-	        | app(Cxt, Cxt)
-	        | Op "(" Exps ")"
-	        | "*"
+  /* Primitive operations */
+  syntax Exp  ::= Val
+                | "rec"     "(" Exp                 ")"
+	        | "app"     "(" Exp "," Exp         ")"
+                | "isatom"  "(" Exp                 ")"
+                | "isnat"   "(" Exp                 ")"
+                | "ispr"    "(" Exp                 ")" 
+                | "br"      "(" Exp "," Exp "," Exp ")" [strict(1)]
+                | "pr"      "(" Exp "," Exp         ")" 
+                | "fst"     "(" Exp                 ")" 
+                | "snd"     "(" Exp                 ")" 
+                | "newadr"  "("                     ")" 
+                | "initbeh" "(" Exp "," Exp         ")" 
+                | "send"    "(" Exp "," Exp         ")" 
+                | "become"  "(" Exp                 ")" 
 
-  syntax Op 
+  /* Non-primitive operations */
+  syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")"
+                | "let" "{" BindingExp "}" Exp
+                | "seq" "(" Exp "," Exp ")"
+                | "letactor" "{" BindingExps "}" Exp
 
-  syntax Exps ::= List{Exp, ","}
-
+  /* Binding expressions */
+  syntax BindingExp  ::= Id ":=" Exp
+  syntax BindingExps ::= List{BindingExp, ","}
 
   /* Meta-level */
   syntax KVariable ::= Id
