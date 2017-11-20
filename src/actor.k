@@ -32,6 +32,7 @@ module ACTOR-SYNTAX
   imports SUBSTITUTION
 
   syntax Atom ::= Int   /* FIXME:: should be non-negative integers */
+                | Bool
                 | "t"
 		| "nil"
 
@@ -65,7 +66,7 @@ module ACTOR-SYNTAX
                 | "become"  "(" Exp                 ")" 
 
   /* Non-primitive operations */
-  syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")"
+  syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")" [strict(1)]
                 | "let" "{" BindingExp "}" Exp
                 | "seq" "(" Exp "," Exp ")"
                 | "letactor" "{" BindingExps "}" Exp
@@ -86,11 +87,27 @@ module ACTOR-SYNTAX
                | "mkget" "(" Exp ")"
                | "set?"  "(" Exp ")"
                | "get?"  "(" Exp ")"
+               | "eq?"   "(" Exp "," Exp ")" [strict]
 
 endmodule
 
 module ACTOR
 
   imports ACTOR-SYNTAX
+
+  configuration <T>
+                  <actors>
+                    <actor multiplicity="*">
+                      <k> $PGM:Exp </k>
+                    </actor>
+                  </actors>
+                </T>
+
+  rule app(\ X:Id . E:Exp, V:Val) => E[V / X]
+
+  rule if (true,  E, _) => E
+  rule if (false, E, _) => E
+
+  rule eq?(V1:Val, V2:Val) => V1 ==K V2
 
 endmodule
