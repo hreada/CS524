@@ -1,0 +1,2 @@
+letactor{Z := rec(\Y.\X.seq(send(X,5),become(Y)))}
+  send(Z,A)

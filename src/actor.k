@@ -31,19 +31,27 @@ module ACTOR-SYNTAX
 
   imports SUBSTITUTION
 
-  syntax Atom ::= Int   /* Should be non-negative Int */
+  syntax Atom ::= Int   /* FIXME:: should be non-negative integers */
                 | "t"
 		| "nil"
 
+  /* Values are expressions that cannot rewrite anymore */
   syntax Val  ::= Atom
                 | Id
                 | "\\" Id "." Exp [binder]
-	        | pr(Val, Val)
+	        | "pr" "(" Val "," Val ")"
+
+  /* Lambda-calculus application */
+  syntax Exp  ::= "app"     "(" Exp "," Exp         ")" [strict]
+
+  /* Prefix form of lambda-calculus applicatoin:
+   * b(e1,...,en) => app(...(app(b,e1),e2)...,en)
+   */
+  syntax Exp  ::= Exp "(" Exps ")"
 
   /* Primitive operations */
   syntax Exp  ::= Val
                 | "rec"     "(" Exp                 ")"
-	        | "app"     "(" Exp "," Exp         ")"
                 | "isatom"  "(" Exp                 ")"
                 | "isnat"   "(" Exp                 ")"
                 | "ispr"    "(" Exp                 ")" 
@@ -66,9 +74,18 @@ module ACTOR-SYNTAX
   syntax BindingExp  ::= Id ":=" Exp
   syntax BindingExps ::= List{BindingExp, ","}
 
+  /* Expressions */
+  syntax Exps  ::= List{Exp, ","}
+
   /* Meta-level */
   syntax KVariable ::= Id
   syntax KResult   ::= Val
+
+  /* User-defined Part */
+  syntax Exp ::= "mkset" "(" Exp ")"
+               | "mkget" "(" Exp ")"
+               | "set?"  "(" Exp ")"
+               | "get?"  "(" Exp ")"
 
 endmodule
 
