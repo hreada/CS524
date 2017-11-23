@@ -1,0 +1,1 @@
+rec(\y.\x.seq(send(x,5),become(y)))

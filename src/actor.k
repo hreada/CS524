@@ -45,11 +45,6 @@ module ACTOR-SYNTAX
   /* Lambda-calculus application */
   syntax Exp  ::= "app"     "(" Exp "," Exp         ")" [strict]
 
-  /* Prefix form of lambda-calculus applicatoin:
-   * b(e1,...,en) => app(...(app(b,e1),e2)...,en)
-   */
-  syntax Exp  ::= Exp "(" Exps ")"
-
   /* Primitive operations */
   syntax Exp  ::= Val
                 | "rec"     "(" Exp                 ")"
@@ -88,6 +83,8 @@ module ACTOR-SYNTAX
                | "set?"  "(" Exp ")"
                | "get?"  "(" Exp ")"
                | "eq?"   "(" Exp "," Exp ")" [strict]
+               | "left"  "(" Exp ")"
+               | "right" "(" Exp ")"
 
 endmodule
 
@@ -109,5 +106,8 @@ module ACTOR
   rule if (false, _, E) => E
 
   rule eq?(V1:Val, V2:Val) => V1 ==K V2
+
+  /* rec(\b.E) = E[rec(\b.E)/b] */
+  rule rec(\ B:Id . E:Exp) => E[rec(\B.E) / B]
 
 endmodule
