@@ -106,7 +106,7 @@ module ACTOR
   rule app(\ X:Id . E:Exp, V:Val) => E[V / X]
 
   rule if (true,  E, _) => E
-  rule if (false, E, _) => E
+  rule if (false, _, E) => E
 
   rule eq?(V1:Val, V2:Val) => V1 ==K V2
 
