@@ -45,6 +45,11 @@ module ACTOR-SYNTAX
   /* Lambda-calculus application */
   syntax Exp  ::= "app"     "(" Exp "," Exp         ")" [strict]
 
+  /* Lambda-calculus application: prefix form.
+   * This is useful in defining actors' behavior
+   */
+  syntax Exp  ::= Id "(" Exp ")"                        [strict]
+
   /* Primitive operations */
   syntax Exp  ::= Val
                 | "rec"     "(" Exp                 ")"
@@ -86,28 +91,56 @@ module ACTOR-SYNTAX
                | "left"  "(" Exp ")"
                | "right" "(" Exp ")"
 
+
+  /* Actor Id */
+  syntax ActorId ::= Int 
+  syntax ActorIds ::= List{Int, ","}
+
+  /* Messages */
+  syntax Message ::= Int /* FIXME */
+  syntax Messages ::= List{Message, ","}
+
 endmodule
 
 module ACTOR
 
   imports ACTOR-SYNTAX
 
+  /* TODO:: Add a <actor-id> or <actor-name> cell inside the <actor> cell
+   *        Add <receptionist> and <external> cells in <T>
+   *        Add <messages> cell in <T>
+   */
+  /* We might want to separate some of the things such as messages to
+   * another K module, but let's do it here and consider separating them
+   * later.
+   */
   configuration <T>
                   <actors>
                     <actor multiplicity="*">
                       <k> $PGM:Exp </k>
+		      <id> 0 </id> /* FIXME:: initialize to different values */
                     </actor>
                   </actors>
+		  <recep>
+		    .ActorIds
+		  </recep>
+		  <ext>
+		    .ActorIds
+		  </ext>
+		  <messages>
+		    .Messages
+		  </messages>
                 </T>
 
   rule app(\ X:Id . E:Exp, V:Val) => E[V / X]
+  rule B:Id(E:Exp) => app(B, E)
 
   rule if (true,  E, _) => E
   rule if (false, _, E) => E
 
   rule eq?(V1:Val, V2:Val) => V1 ==K V2
 
-  /* rec(\b.E) = E[rec(\b.E)/b] */
+  /* rule for recursion: rec(\b.E) = E[rec(\b.E)/b] */
   rule rec(\ B:Id . E:Exp) => E[rec(\B.E) / B]
 
 endmodule
