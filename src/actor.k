@@ -63,7 +63,8 @@ module ACTOR-SYNTAX
                 | "newadr"  "("                     ")" 
                 | "initbeh" "(" Exp "," Exp         ")" 
                 | "send"    "(" Exp "," Exp         ")" 
-                | "become"  "(" Exp                 ")" 
+                | "become"  "(" Exp                 ")"
+                | Exp "*" Exp                             [strict]
 
   /* Non-primitive operations */
   syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")" [strict(1)]
@@ -90,6 +91,11 @@ module ACTOR-SYNTAX
                | "eq?"   "(" Exp "," Exp ")" [strict]
                | "left"  "(" Exp ")"
                | "right" "(" Exp ")"
+               | "isnat" "(" Exp ")"
+  
+  /* User-defined actor behavior */
+  syntax Exp ::= "treeprod"
+               | "joincont"
 
 
   /* Actor Id */
@@ -142,5 +148,30 @@ module ACTOR
 
   /* rule for recursion: rec(\b.E) = E[rec(\b.E)/b] */
   rule rec(\ B:Id . E:Exp) => E[rec(\B.E) / B]
+  
+  syntax Id ::= "b"
+              | "self"
+              | "m"
+              | "cust"
+              | "nargs"
+              | "firstnum"
+              | "num"
+              | "newcust"
+  
+  /* User-defined Part */
+  rule treeprod =>
+    rec(\b.\self.\m.
+      seq(become(b(self),
+        if(isnat(tree(m)),
+           send(cust(m), tree(m)),
+           letactor{newcust := joincont(cust(m),0,nil)}
+             seq(send(self, pr(left(tree(m)), newcust)),
+                 send(self, pr(right(tree(m)), newcust)))))))
+  rule joincont =>
+    rec(\b.\cust.\nargs.\firstnum.\num.
+      if(eq(nargs,0),
+         become(b(cust,1,num)),
+         seq(become(sink),
+             send(cust,firstnum * num))))
 
 endmodule
