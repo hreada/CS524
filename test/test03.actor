@@ -1,6 +1,0 @@
-rec(\b.\c.\m.
-  if(get?(m),
-     seq(become(b(c)), send(cust(m), c)),
-     if(set?(m),
-        become(b(contents(m))),
-        become(b(c)))))

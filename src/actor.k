@@ -30,30 +30,32 @@ require "substitution.k"
 module ACTOR-SYNTAX
 
   imports SUBSTITUTION
-
-  syntax Atom ::= Int   /* FIXME:: should be non-negative integers */
-                | Bool
+  
+  /* Atoms */
+  
+  syntax Atm  ::= Int
                 | "t"
-		| "nil"
+                | "nil"
+  
+  /* Values are terms that cannot rewrite anymore. */
 
-  /* Values are expressions that cannot rewrite anymore */
-  syntax Val  ::= Atom
-                | Id
-                | "\\" Id "." Exp [binder]
-	        | "pr" "(" Val "," Val ")"
+  syntax Val  ::= Atm
+                | Id                          // variables
+                | "\\" Id "." Exp [binder]    // lambda abstraction
+                | PairVal                     // pairs
+  syntax PairVal ::= "pr" "(" Val "," Val ")"
 
-  /* Lambda-calculus application */
-  syntax Exp  ::= "app"     "(" Exp "," Exp         ")" [strict]
+  /* Expressions */
+  
+  syntax Exp  ::= Val                        // values
+  
+  syntax Exp  ::= "app" "(" Exp "," Exp ")" [seqstrict] // lambda application
+  
+  syntax Exp  ::= "rec" "(" Exp ")" // call-by-value fixed-point combinator
 
-  /* Lambda-calculus application: prefix form.
-   * This is useful in defining actors' behavior
-   */
-  syntax Exp  ::= Id "(" Exp ")"                        [strict]
-
-  /* Primitive operations */
-  syntax Exp  ::= Val
-                | "rec"     "(" Exp                 ")"
-                | "isatom"  "(" Exp                 ")"
+  /* Expressions that are constructed using primitive operations. */
+  
+  syntax Exp  ::= "isatom"  "(" Exp                 ")"
                 | "isnat"   "(" Exp                 ")"
                 | "ispr"    "(" Exp                 ")" 
                 | "br"      "(" Exp "," Exp "," Exp ")" [strict(1)]
@@ -64,26 +66,26 @@ module ACTOR-SYNTAX
                 | "initbeh" "(" Exp "," Exp         ")" 
                 | "send"    "(" Exp "," Exp         ")" 
                 | "become"  "(" Exp                 ")"
-                | Exp "*" Exp                             [strict]
 
-  /* Non-primitive operations */
-  syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")" [strict(1)]
-                | "let" "{" BindingExp "}" Exp
+  /* Expressions that are syntactic sugar.
+   * They don't need the [strict] attribute as they simply rewrite
+   * to expressions with primitive operations
+   */
+  syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")" 
+                | "let" "{" Binding "}" Exp
                 | "seq" "(" Exp "," Exp ")"
-                | "letactor" "{" BindingExps "}" Exp
+                | "letactor" "{" Bindings "}" Exp
 
-  /* Binding expressions */
-  syntax BindingExp  ::= Id ":=" Exp
-  syntax BindingExps ::= List{BindingExp, ","}
+  /* Bindings and lists of bindings */
+  
+  syntax Binding  ::= Id ":=" Exp
+  syntax Bindings ::= List{Binding, ","}
 
-  /* Expressions */
-  syntax Exps  ::= List{Exp, ","}
-
-  /* Meta-level */
+  /* Meta-level information for rewriting */
   syntax KVariable ::= Id
   syntax KResult   ::= Val
 
-  /* User-defined Part */
+  /* Expressions that are constructed using more operations. */
   syntax Exp ::= "mkset" "(" Exp ")"
                | "mkget" "(" Exp ")"
                | "set?"  "(" Exp ")"
@@ -91,19 +93,18 @@ module ACTOR-SYNTAX
                | "eq?"   "(" Exp "," Exp ")" [strict]
                | "left"  "(" Exp ")"
                | "right" "(" Exp ")"
-               | "isnat" "(" Exp ")"
+               | "cust"  "(" Exp ")"
   
-  /* User-defined actor behavior */
+  /* User-defined actor behavior as expressions. */
   syntax Exp ::= "treeprod"
                | "joincont"
 
-
-  /* Actor Id */
-  syntax ActorId ::= Int 
-  syntax ActorIds ::= List{Int, ","}
+  /* ActorIds */
+  syntax ActorId  ::= Int 
+  syntax ActorIds ::= List{ActorId, ","}
 
   /* Messages */
-  syntax Message ::= Int /* FIXME */
+  syntax Message  ::= Int /* FIXME */
   syntax Messages ::= List{Message, ","}
 
 endmodule
@@ -112,19 +113,11 @@ module ACTOR
 
   imports ACTOR-SYNTAX
 
-  /* TODO:: Add a <actor-id> or <actor-name> cell inside the <actor> cell
-   *        Add <receptionist> and <external> cells in <T>
-   *        Add <messages> cell in <T>
-   */
-  /* We might want to separate some of the things such as messages to
-   * another K module, but let's do it here and consider separating them
-   * later.
-   */
   configuration <T>
                   <actors>
                     <actor multiplicity="*">
                       <k> $PGM:Exp </k>
-		      <id> 0 </id> /* FIXME:: initialize to different values */
+		      <id> 0 </id> /* FIXME initialize to different values */
                     </actor>
                   </actors>
 		  <recep>
@@ -137,41 +130,90 @@ module ACTOR
 		    .Messages
 		  </messages>
                 </T>
-
-  rule app(\ X:Id . E:Exp, V:Val) => E[V / X]
-  rule B:Id(E:Exp) => app(B, E)
-
-  rule if (true,  E, _) => E
-  rule if (false, _, E) => E
-
-  rule eq?(V1:Val, V2:Val) => V1 ==K V2
-
-  /* rule for recursion: rec(\b.E) = E[rec(\b.E)/b] */
-  rule rec(\ B:Id . E:Exp) => E[rec(\B.E) / B]
   
-  syntax Id ::= "b"
-              | "self"
-              | "m"
-              | "cust"
-              | "nargs"
-              | "firstnum"
-              | "num"
-              | "newcust"
+  /* Desugar rules for syntactic sugar (page 15) */
   
-  /* User-defined Part */
-  rule treeprod =>
-    rec(\b.\self.\m.
-      seq(become(b(self),
-        if(isnat(tree(m)),
-           send(cust(m), tree(m)),
-           letactor{newcust := joincont(cust(m),0,nil)}
-             seq(send(self, pr(left(tree(m)), newcust)),
-                 send(self, pr(right(tree(m)), newcust)))))))
-  rule joincont =>
-    rec(\b.\cust.\nargs.\firstnum.\num.
-      if(eq(nargs,0),
-         become(b(cust,1,num)),
-         seq(become(sink),
-             send(cust,firstnum * num))))
+  rule if(E0:Exp, E1:Exp, E2:Exp)
+    => app(br(E0, \?Z.E1, \?Z.E2), nil)
+   
+  rule let{X:Id := E0:Exp} E1
+    => app(\X.E1, E0)
+    
+  rule seq(E0:Exp, E1:Exp)
+    => app(app(\?Z.\?X.?X, E0), E1)
+  
+  rule letactor{.Bindings} E:Exp
+    => E:Exp
+  rule letactor{X1:Id := E1:Exp} E:Exp
+    => let{X1 := newadr()}
+         seq(initbeh(X1, E1), E)
+  rule letactor{X1:Id := E1:Exp, X2:Id := E2:Exp} E:Exp // FIXME
+    => let{X1 := newadr()} let{X2 := newadr()}
+         seq(initbeh(X1, E1),
+         seq(initbeh(X2, E2), E))
+         
+  /* Reduction rule for fixed-point combinator (I wrote it by myself) */
+  
+  rule rec(\B:Id . E:Exp) => E[rec(\B.E) / B]
 
+  /* Reduction rules of expressions (page 18) */
+  
+  /* (beta-v) */
+  rule app(\X:Id . E:Exp, V:Val) 
+    => E[V / X]
+  
+  /* (delta) rules are defined for each operators */
+  
+  /* (br) */
+  rule br(nil  , V1:Val, V2:Val) => V2
+  rule br(V:Val, V1:Val, V2:Val) => V1       // FIXME consider known addresses
+    requires V:Val =/=K nil
+    
+  /* (ispr) */
+  rule ispr(V:PairVal) => t
+  rule ispr(V:Val)     => nil                // FIXME consider known addresses
+    requires notBool(isPairVal(V))
+  
+  /* (fst) & (snd) */
+  rule fst(pr(V1:Val, V2:Val)) => V1:Val
+  rule snd(pr(V1:Val, V2:Val)) => V2:Val
+  
+  /* (eq) */
+  rule eq?(V1:Atm, V2:Atm) => t   requires V1 ==K  V2
+  rule eq?(V1:Atm, V2:Atm) => nil requires V1 =/=K V2
+
+  
 endmodule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
