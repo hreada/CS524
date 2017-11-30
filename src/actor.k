@@ -51,7 +51,7 @@ module ACTOR-SYNTAX
   
   syntax Exp  ::= "app" "(" Exp "," Exp ")" [seqstrict] // lambda application
   
-  syntax Exp  ::= "rec" "(" Exp ")" // call-by-value fixed-point combinator
+  syntax Val  ::= "rec" "(" Exp ")" // call-by-value fixed-point combinator
 
   /* Expressions that are constructed using primitive operations. */
   
@@ -98,49 +98,51 @@ module ACTOR-SYNTAX
   /* User-defined actor behavior as expressions. */
   syntax Exp ::= "treeprod"
                | "joincont"
-
-  /* ActorIds */
-  syntax ActorId  ::= Int 
-  syntax ActorIds ::= List{ActorId, ","}
-
-  /* Messages */
-  syntax Message  ::= Int /* FIXME */
-  syntax Messages ::= List{Message, ","}
+               
+  /* Message */
+  syntax Message ::= "<" Val "<=" Val ">"
+  
+  /* Actor states */
+  syntax AState  ::= "(" "?" Id ")"
+                   | "(" Val ")"
+                   | "[" Exp "]"    [strict]
+                   
+  /* Communication values */
+  syntax CVal    ::= Atm
+                   | Id
+                   | "pr" "(" CVal "," CVal ")"
 
 endmodule
 
 module ACTOR
 
   imports ACTOR-SYNTAX
+  
+  syntax Id ::= "a"
 
-  configuration <T>
-                  <actors>
-                    <actor multiplicity="*">
-                      <k> $PGM:Exp </k>
-		      <id> 0 </id> /* FIXME initialize to different values */
+  configuration <T color="red">
+                  <actors color="orange">
+                    <actor multiplicity="*" color="yellow">
+                      <k color="green"> [ $PGM:Exp ] </k>
+		      <id> a </id>
                     </actor>
                   </actors>
-		  <recep>
-		    .ActorIds
-		  </recep>
-		  <ext>
-		    .ActorIds
-		  </ext>
-		  <messages>
-		    .Messages
-		  </messages>
+                  <messages> .List </messages>
+                  <definedaddr> ListItem(a) </definedaddr>
+                  <ext> .List </ext>
+		  <recep> .List </recep>
                 </T>
   
   /* Desugar rules for syntactic sugar (page 15) */
   
   rule if(E0:Exp, E1:Exp, E2:Exp)
-    => app(br(E0, \?Z.E1, \?Z.E2), nil)
+    => app(br(E0, \!Z.E1, \!Z.E2), nil)
    
   rule let{X:Id := E0:Exp} E1
     => app(\X.E1, E0)
     
   rule seq(E0:Exp, E1:Exp)
-    => app(app(\?Z.\?X.?X, E0), E1)
+    => app(app(\!Z.\!X.!X, E0), E1)
   
   rule letactor{.Bindings} E:Exp
     => E:Exp
@@ -154,7 +156,7 @@ module ACTOR
          
   /* Reduction rule for fixed-point combinator (I wrote it by myself) */
   
-  rule rec(\B:Id . E:Exp) => E[rec(\B.E) / B]
+  rule rec(\B:Id . E:Exp) => E[rec(\B.E) / B] [structural]
 
   /* Reduction rules of expressions (page 18) */
   
@@ -181,6 +183,32 @@ module ACTOR
   /* (eq) */
   rule eq?(V1:Atm, V2:Atm) => t   requires V1 ==K  V2
   rule eq?(V1:Atm, V2:Atm) => nil requires V1 =/=K V2
+  
+  
+  
+  /* Transition rules for configurations (page 19) */
+  
+  /* <init : a, a'> */
+  rule <k> initbeh(A', V:Val) => nil </k>
+
+  /*     <actor>
+         <k> ( ? A ) => ( V ) </k>
+         <id> A' </id>
+       </actor> */
+
+
+       
+  
+  /* <new : a, a'> */
+  rule <actor>
+         <k> newadr() => !A':Id ... </k>
+         <id> A </id>
+       </actor>
+       (.Bag => <actor>
+                  <k> ( ? A ) </k>
+                  <id> !A' </id>
+                </actor>)
+       <definedaddr> Ads => Ads ListItem(!A') </definedaddr>
 
   
 endmodule
