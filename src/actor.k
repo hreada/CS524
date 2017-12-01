@@ -132,25 +132,9 @@ module ACTOR
   
   rule letactor(.Bindings, E:Exp)
     => E:Exp
-  rule letactor(bind(X1:Id, E1:Exp), E:Exp)
+  rule letactor((bind(X1:Id, E1:Exp), BS:Bindings), E:Exp)
     => let(bind(X1, newadr()),
-         seq(initbeh(X1, E1), E))
-  rule letactor((bind(X1:Id, E1:Exp), bind(X2:Id, E2:Exp)), E:Exp) // FIXME
-    => let(bind(X1, newadr()),
-       let(bind(X2, newadr()),
-         seq(initbeh(X1, E1),
-         seq(initbeh(X2, E2), E))))
-  rule letactor(
-         (bind(X1:Id, E1:Exp),
-          bind(X2:Id, E2:Exp),
-          bind(X3:Id, E3:Exp)),
-         E:Exp)
-    => let(bind(X1, newadr()),
-       let(bind(X2, newadr()),
-       let(bind(X3, newadr()),
-         seq(initbeh(X1, E1),
-         seq(initbeh(X2, E2),
-         seq(initbeh(X3, E3), E))))))
+         letactor(BS, E))
          
   /* Reduction rules for the fixed-point combinator (I wrote it by myself) */
   
