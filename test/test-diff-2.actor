@@ -1,0 +1,6 @@
+letactor(
+  bind(dummy, lambda(m, m)),
+  bind(diff, rec(lambda(beh, lambda(m,
+    seq(send(dummy, minus(fst(m), snd(m))),
+        become(beh)))))),
+  send(diff, pr(42, 24)))

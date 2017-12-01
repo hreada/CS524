@@ -44,17 +44,17 @@ module ACTOR-SYNTAX
   syntax Exp  ::= "app" "(" Exp "," Exp ")" [seqstrict] // lambda application
   
   /* Expressions constructed with primitive operations (page 14) */
-  syntax Exp  ::= "isatom"  "(" Exp                 ")" [function]
-                | "isnat"   "(" Exp                 ")" [function]
-                | "ispr"    "(" Exp                 ")" 
+  syntax Exp  ::= "isatom"  "(" Exp                 ")" [seqstrict]
+                | "isnat"   "(" Exp                 ")" [seqstrict]
+                | "ispr"    "(" Exp                 ")" [seqstrict]
                 | "br"      "(" Exp "," Exp "," Exp ")" [strict(1)]
-                | "pr"      "(" Exp "," Exp         ")" [strict]
-                | "fst"     "(" Exp                 ")" [function]
-                | "snd"     "(" Exp                 ")" [function]
-                | "newadr"  "("                     ")" 
-                | "initbeh" "(" Exp "," Exp         ")" 
-                | "send"    "(" Exp "," Exp         ")" 
-                | "become"  "(" Exp                 ")"
+                | "pr"      "(" Exp "," Exp         ")" [seqstrict]
+                | "fst"     "(" Exp                 ")" [seqstrict]
+                | "snd"     "(" Exp                 ")" [seqstrict]
+                | "newadr"  "("                     ")" [seqstrict]
+                | "initbeh" "(" Exp "," Exp         ")" [seqstrict]
+                | "send"    "(" Exp "," Exp         ")" [seqstrict]
+                | "become"  "(" Exp                 ")" [seqstrict]
 
   /* Expressions that are syntactic sugar (page 15) */
   syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")" 
@@ -67,17 +67,17 @@ module ACTOR-SYNTAX
   syntax Bindings ::= List{Binding, ","}
 
   /* Expressions constructed with user-defined functions. */
-  syntax Exp ::= "mkset" "(" Exp ")"         [function]
-               | "mkget" "(" Exp ")"         [function]
-               | "set?"  "(" Exp ")"         [function]
-               | "get?"  "(" Exp ")"         [function]
-               | "eq?"   "(" Exp "," Exp ")" [function]
-               | "left"  "(" Exp ")"         [function]
-               | "right" "(" Exp ")"         [function]
-               | "cust"  "(" Exp ")"         [function]
-               | "add"   "(" Exp "," Exp ")" [function]
-               | "minus" "(" Exp "," Exp ")" [function]
-               | "le"    "(" Exp "," Exp ")" [function]
+  syntax Exp ::= "mkset" "(" Exp ")"         [seqstrict]
+               | "mkget" "(" Exp ")"         [seqstrict]
+               | "set?"  "(" Exp ")"         [seqstrict]
+               | "get?"  "(" Exp ")"         [seqstrict]
+               | "eq?"   "(" Exp "," Exp ")" [seqstrict]
+               | "left"  "(" Exp ")"         [seqstrict]
+               | "right" "(" Exp ")"         [seqstrict]
+               | "cust"  "(" Exp ")"         [seqstrict]
+               | "add"   "(" Exp "," Exp ")" [seqstrict]
+               | "minus" "(" Exp "," Exp ")" [seqstrict]
+               | "le"    "(" Exp "," Exp ")" [seqstrict]
                
   /* Message */
   /* Messages are not syntactically restricted to be of the form
