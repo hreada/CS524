@@ -1,4 +1,4 @@
-module EQUALITY-SPEC
+module REC-SPEC
   imports ACTOR
   
   rule
