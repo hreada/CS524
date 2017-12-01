@@ -139,29 +139,38 @@ module ACTOR
    *      seq(initbeh(x2,e2),
    *      ...
    *      seq(initbeh(xn,en), e))))))
-   * Auxilliary functions are defined to help us rewrite it
    */
   rule letactor(BS:Bindings, E:Exp)
     => letactor-aux(BS:Bindings, E:Exp, BS:Bindings)
   
+  /* letactor-aux is an auxiliary function that helps us rewrite letactor.
+   * It makes two copies of the bindings and remembers them
+   * in the first and third argument.
+   * 
+   * The first argument is for constructing nested let expressions.
+   * The third argument is for constructing nested seq expressions.
+   * 
+   * The rules for letactor-aux are defined inductively on its first and 
+   * third arguments.
+   */
+  syntax Exp ::= "letactor-aux" "(" Bindings "," Exp "," Bindings ")"
+   
   rule letactor-aux(
-         bind(X1:Id, E1:Exp), RestBS:Bindings,
+         bind(X1:Id, E1:Exp), RestBS:Bindings,   // first arg is nonempty
          E:Exp,
          AllBS:Bindings)
-    => let(bind(X1, newadr()), letactor-aux(RestBS, E, AllBS))
+    => let(bind(X1, newadr()),                   // construct let expression
+         letactor-aux(RestBS, E, AllBS))
   
   rule letactor-aux(
-         .Bindings,
+         .Bindings,                              // first arg is empty
          E:Exp,
-         bind(X1:Id, E1:Exp), RestBS:Bindings)
-    => seq(initbeh(X1, E1), letactor-aux(.Bindings, E, RestBS))
+         bind(X1:Id, E1:Exp), RestBS:Bindings)   // third arg is nonempty
+    => seq(initbeh(X1, E1),                      // construct seq expression
+         letactor-aux(.Bindings, E, RestBS))
   
-  rule letactor-aux(
-         .Bindings,
-         E:Exp,
-         .Bindings)
+  rule letactor-aux(.Bindings, E:Exp, .Bindings) // both args are empty
     => E
-  syntax Exp ::= "letactor-aux" "(" Bindings "," Exp "," Bindings ")"
          
   /* Reduction rules for the fixed-point combinator (I wrote it by myself) */
   
