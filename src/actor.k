@@ -16,11 +16,16 @@ module ACTOR-SYNTAX
   
   /* Values are terms that cannot rewrite anymore. */
 
-  syntax Val  ::= Atm
+  /* Communication values */
+  syntax CVal ::= Atm
                 | Id                                    // variables
+                | "pr" "(" CVal "," CVal ")"            // pairs
+                   
+  syntax Val  ::= CVal                                    
                 | "lambda" "(" Id "," Exp ")" [binder]  // lambda abstraction
-                | PairVal                               // pairs
-  syntax PairVal ::= "pr" "(" Val "," Val ")"
+                | "pr" "(" Val "," Val ")"              // pairs
+  
+
 
   /* Expressions */
   
@@ -74,21 +79,15 @@ module ACTOR-SYNTAX
                
   /* Message */
   syntax Message ::= "msg" "(" Val "," Val ")"  // message < lhs <= rhs >
-  
+                   
   /* Actor states */
   syntax AState  ::= "uninit" "(" Id  ")"            // (?a) uninitialized
                    | "ready"  "(" Val ")"            // (b)  ready to accept msg
                    | "exec"   "(" Exp ")"  [strict]  // [e]  busy executing e
-                   
-  /* Communication values */
-  syntax CVal    ::= Atm
-                   | Id
-                   | "pr" "(" CVal "," CVal ")"
 
   /* Meta-level information for rewriting */
   syntax KVariable ::= Id
   syntax KResult   ::= Val
-                     | CVal
   
 endmodule
 
@@ -96,17 +95,21 @@ module ACTOR
 
   imports ACTOR-SYNTAX
   
-  syntax Id ::= "a" // the id of actor in the initial configuration
+  syntax Id ::= "initactor"
 
   configuration <T color="red">
                   <actors color="orange">
                     <actor multiplicity="*" color="yellow">
                       <k color="green"> exec($PGM:Exp) </k>
-		      <id> a </id>
+		      <id> initactor </id>
                     </actor>
                   </actors>
-                  <messages> .List </messages>
-                  <definedaddr> ListItem(a) </definedaddr>
+                  <messages>
+                    <message  multiplicity="*">
+                      .K
+                    </message>
+                  </messages>
+                  <definedaddr> ListItem(initactor) </definedaddr>
                   <ext> .List </ext>
 		  <recep> .List </recep>
                 </T>
@@ -135,7 +138,11 @@ module ACTOR
          
   /* Reduction rule for fixed-point combinator (I wrote it by myself) */
   
-  rule rec(lambda(B:Id, E:Exp)) => E[rec(lambda(B, E)) / B] [structural]
+  rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
+    => app(subst(E1, rec(lambda(B, E1)), B), E2)
+    
+  syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")"
+  rule subst(K1, K2, K3) => K1 [ K2 / K3 ]
 
   /* Reduction rules of expressions (page 18) */
   
@@ -144,15 +151,18 @@ module ACTOR
   
   /* (delta) rules are defined for each operators */
   
-  /* (br) */
+  /* (br) FIXME consider known addresses */
   rule br(nil  , V1:Val, V2:Val) => V2
-  rule br(V:Val, V1:Val, V2:Val) => V1       // FIXME consider known addresses
+  rule br(V:Val, V1:Val, V2:Val) => V1  
     requires V:Val =/=K nil
     
-  /* (ispr) */
-  rule ispr(V:PairVal) => t
-  rule ispr(V:Val)     => nil                // FIXME consider known addresses
-    requires notBool(isPairVal(V))
+  /* (ispr) FIXME consider known addresses */
+  rule ispr(V:Val) => t    requires isPairVal(V)
+  rule ispr(V:Val) => nil  requires notBool(isPairVal(V))
+    
+  syntax Bool ::= "isPairVal" "(" Val ")" [function]
+  rule isPairVal(pr(V1:Val, V2:Val)) => true
+  rule isPairVal(_)                  => false [owise]
   
   /* (fst) & (snd) */
   rule fst(pr(V1:Val, V2:Val)) => V1:Val
@@ -166,16 +176,6 @@ module ACTOR
   
   /* Transition rules for configurations (page 19) */
   
-  /* <init : a, a1> */
-  rule <actor>
-         <k> initbeh(A1, V:Val) => nil ... </k>
-         <id> A </id>
-       </actor>
-       <actor>
-         <k> uninit(A) => ready(V) ... </k>
-         <id> A1 </id>
-       </actor>
-  
   /* <new : a, a1> */
   rule <actor>
          <k> newadr() => !A1:Id ... </k>
@@ -186,6 +186,29 @@ module ACTOR
                   <id> !A1 </id>
                 </actor>)
        <definedaddr> Ads => Ads ListItem(!A1) </definedaddr>
+       
+       
+  /* <init : a, a1> */
+  rule <actor>
+         <k> initbeh(A1, V:Val) => nil ... </k>
+         <id> A </id>
+       </actor>
+       <actor>
+         <k> uninit(A) => ready(V) ... </k>
+         <id> A1 </id>
+       </actor>
+       
+  /* <bec : a, a1> */
+  rule <actor>
+         <k> become(V:Val) => nil ... </k>
+         <id> A => !A1:Id </id>
+       </actor>
+       (.Bag => <actor>
+                  <k> ready(V) </k>
+                  <id> A </id>
+                </actor>)
+       <definedaddr> Ads => Ads ListItem(!A1) </definedaddr>
+
 
   /* <send : a, m> */
   rule <actor>
@@ -193,7 +216,18 @@ module ACTOR
          <id> A </id>
        </actor>
        <messages>
-         .List => ListItem( msg(V0, V1) ) ...
+         .Bag => <message> msg(V0, V1) </message>
+         ...
+       </messages>
+  
+  /* <rcv : a, cv> */
+  rule <actor>
+         <k> ready(V:Val) => exec(app(V, CV)) ... </k>
+         <id> A </id>
+       </actor>
+       <messages>
+         (<message> msg(A, CV:CVal) </message>) => .Bag
+         ...
        </messages>
   
 endmodule
