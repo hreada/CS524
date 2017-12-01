@@ -8,38 +8,45 @@ module ACTOR-SYNTAX
 
   imports SUBSTITUTION
   
-  /* Atoms */
+  /* Values are terms that cannot rewrite anymore.
+   * There are some main sub-categories of values.
+   * Atoms are values that can be checked whether equal or not.
+   * Comminication values are values that can be received in messages.
+   */
   
+  /* Atoms */  
   syntax Atm  ::= Int
-                | "t"
-                | "nil"
+                | "t"    // the boolean true  in our actor language
+                | "nil"  // the boolean false in our actor language
   
-  /* Values are terms that cannot rewrite anymore. */
-
   /* Communication values */
   syntax CVal ::= Atm
-                | Id                                    // variables
-                | "pr" "(" CVal "," CVal ")"            // pairs
-                   
+                | Id                            // variables
+                | "pr" "(" CVal "," CVal ")"    // pairs of CVal
+  
+  /* Values */
   syntax Val  ::= CVal                                    
                 | "lambda" "(" Id "," Exp ")" [binder]  // lambda abstraction
-                | "pr" "(" Val "," Val ")"              // pairs
+                | "pr" "(" Val "," Val ")"              // pairs of Val
   
-
-
+  /* Call-by-value fixed-point combinator.
+   * It is regarded as a value. We only unfold it once
+   * when it is applied to an argument.
+   */
+  syntax Val  ::= "rec" "(" Exp ")"
+  
+  
   /* Expressions */
   
-  syntax Exp  ::= Val                        // values
+  syntax Exp  ::= Val   // values
   
+  /* lambda application is evaluated from left to right (page 18) */
   syntax Exp  ::= "app" "(" Exp "," Exp ")" [seqstrict] // lambda application
   
-  syntax Val  ::= "rec" "(" Exp ")" // call-by-value fixed-point combinator
-
-  /* Expressions that are constructed using primitive operations. */
-  
+  /* Expressions constructed with primitive operations (page 14) */
   syntax Exp  ::= "isatom"  "(" Exp                 ")" [function]
                 | "isnat"   "(" Exp                 ")" [function]
-                | "ispr"    "(" Exp                 ")" [function]
+                | "ispr"    "(" Exp                 ")" 
                 | "br"      "(" Exp "," Exp "," Exp ")" [strict(1)]
                 | "pr"      "(" Exp "," Exp         ")" [strict]
                 | "fst"     "(" Exp                 ")" [function]
@@ -49,21 +56,17 @@ module ACTOR-SYNTAX
                 | "send"    "(" Exp "," Exp         ")" 
                 | "become"  "(" Exp                 ")"
 
-  /* Expressions that are syntactic sugar.
-   * They don't need the [strict] attribute as they simply rewrite
-   * to expressions with primitive operations
-   */
+  /* Expressions that are syntactic sugar (page 15) */
   syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")" 
                 | "let" "(" Binding "," Exp ")"
                 | "seq" "(" Exp "," Exp ")"
                 | "letactor" "(" Bindings "," Exp ")"
 
   /* Bindings and lists of bindings */
-  
-  syntax Binding  ::= "bind" "(" Id "," Exp ")"
+  syntax Binding  ::= "bind" "(" Id "," Exp ")"  // Id := Exp
   syntax Bindings ::= List{Binding, ","}
 
-  /* Expressions that are constructed using more operations. */
+  /* Expressions constructed with user-defined functions. */
   syntax Exp ::= "mkset" "(" Exp ")"         [function]
                | "mkget" "(" Exp ")"         [function]
                | "set?"  "(" Exp ")"         [function]
@@ -77,14 +80,17 @@ module ACTOR-SYNTAX
                | "le"    "(" Exp "," Exp ")" [function]
                
   /* Message */
-  syntax Message ::= "msg" "(" Val "," Val ")"  // message < lhs <= rhs >
+  /* Messages are not syntactically restricted to be of the form
+   * <Ad <= cV> (page 17).
+   */
+  syntax Message ::= "msg" "(" Val "," Val ")"  // < lhs <= rhs >
                    
-  /* Actor states */
+  /* Actor states (page 16) */
   syntax AState  ::= "uninit" "(" Id  ")"            // (?a) uninitialized
                    | "ready"  "(" Val ")"            // (b)  ready to accept msg
                    | "exec"   "(" Exp ")"  [strict]  // [e]  busy executing e
 
-  /* Meta-level information for rewriting */
+  /* Meta-level information for rewriting strategies */
   syntax KVariable ::= Id
   syntax KResult   ::= Val
   
@@ -94,7 +100,7 @@ module ACTOR
 
   imports ACTOR-SYNTAX
   
-  syntax Id ::= "initactor"
+  syntax Id ::= "initactor" // the id of the initial actor
 
   configuration <T color="red">
                   <actors color="orange">
@@ -113,7 +119,7 @@ module ACTOR
 		  <recep> .List </recep>
                 </T>
   
-  /* Desugar rules for syntactic sugar (page 15) */
+  /* Desugaring rules for syntactic sugar (page 15) */
   
   rule if(E0:Exp, E1:Exp, E2:Exp)
     => app(br(E0, lambda(!Z, E1), lambda(!Z, E2)), nil)
@@ -146,12 +152,12 @@ module ACTOR
          seq(initbeh(X2, E2),
          seq(initbeh(X3, E3), E))))))
          
-  /* Reduction rule for fixed-point combinator (I wrote it by myself) */
+  /* Reduction rules for the fixed-point combinator (I wrote it by myself) */
   
   rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
     => app(subst(E1, rec(lambda(B, E1)), B), E2)
     
-  syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")"
+  syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")" // needed for parsing
   rule subst(K1, K2, K3) => K1 [ K2 / K3 ]
 
   /* Reduction rules of expressions (page 18) */
@@ -165,14 +171,21 @@ module ACTOR
   rule le(   M:Int, N:Int)    => t        requires M <=Int N
   rule le(   M:Int, N:Int)    => nil      requires M >Int N
   
-  /* (br) FIXME consider known addresses */
+  /* (br) */
   rule br(nil  , V1:Val, V2:Val) => V2
-  rule br(V:Val, V1:Val, V2:Val) => V1  
-    requires V:Val =/=K nil
+  rule <k> br(V:Val, V1:Val, V2:Val) => V1 ... </k>
+       <definedaddr> X </definedaddr>
+    requires notBool((isId(V) andBool notBool(V in X)) orBool V ==K nil)
+    // see page 18:
+    // if v \in \mathcal{V} - ((\mathcal{X} - X) U {nil})
     
-  /* (ispr) FIXME consider known addresses */
+  /* (ispr) */
   rule ispr(V:Val) => t    requires isPairVal(V)
-  rule ispr(V:Val) => nil  requires notBool(isPairVal(V))
+  rule <k> ispr(V:Val) => nil ... </k>
+       <definedaddr> X </definedaddr>
+    requires notBool((isId(V) andBool notBool(V in X)) orBool isPairVal(V))
+    // see page 18:
+    // if v \in \mathcal{V} - ((\mathcal{X} - X) U pr(\mathcal{V}, \mathcal{V}))
     
   syntax Bool ::= "isPairVal" "(" Val ")" [function]
   rule isPairVal(pr(V1:Val, V2:Val)) => true
