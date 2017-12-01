@@ -55,7 +55,8 @@ module ACTOR-SYNTAX
                 | "initbeh" "(" Exp "," Exp         ")" [seqstrict]
                 | "send"    "(" Exp "," Exp         ")" [seqstrict]
                 | "become"  "(" Exp                 ")" [seqstrict]
-
+                | "eq?"     "(" Exp "," Exp         ")" [seqstrict]
+                
   /* Expressions that are syntactic sugar (page 15) */
   syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")" 
                 | "let" "(" Binding "," Exp ")"
@@ -71,12 +72,13 @@ module ACTOR-SYNTAX
                | "mkget" "(" Exp ")"         [seqstrict]
                | "set?"  "(" Exp ")"         [seqstrict]
                | "get?"  "(" Exp ")"         [seqstrict]
-               | "eq?"   "(" Exp "," Exp ")" [seqstrict]
+               | "cust"  "(" Exp ")"         [seqstrict]
+               | "tree"  "(" Exp ")"         [seqstrict]
                | "left"  "(" Exp ")"         [seqstrict]
                | "right" "(" Exp ")"         [seqstrict]
-               | "cust"  "(" Exp ")"         [seqstrict]
                | "add"   "(" Exp "," Exp ")" [seqstrict]
                | "minus" "(" Exp "," Exp ")" [seqstrict]
+               | "mult"  "(" Exp "," Exp ")" [seqstrict]
                | "le"    "(" Exp "," Exp ")" [seqstrict]
                
   /* Message */
@@ -188,8 +190,16 @@ module ACTOR
   /* (delta) rules are defined for each operators */
   rule add(  M:Int, N:Int)    => M +Int N
   rule minus(M:Int, N:Int)    => M -Int N
+  rule mult( M:Int, N:Int)    => M *Int N
   rule le(   M:Int, N:Int)    => t        requires M <=Int N
   rule le(   M:Int, N:Int)    => nil      requires M >Int N
+  /* See page 11. Messages are pairs of a tree and an address.
+   * Trees are nested pairs.
+   */
+  rule tree(pr(Tree:Val, Cust:Val)) => Tree
+  rule cust(pr(Tree:Val, Cust:Val)) => Cust
+  rule left (Tree:Val)              => fst(Tree)
+  rule right(Tree:Val)              => snd(Tree)
   
   /* (br) */
   rule br(nil  , V1:Val, V2:Val) => V2
