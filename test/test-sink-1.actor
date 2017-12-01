@@ -1,0 +1,6 @@
+letactor(
+  bind(sink, rec(lambda(b, lambda(m, become(b))))),
+  seq(send(sink, 0),
+  seq(send(sink, 1),
+  seq(send(sink, 2),
+      send(sink, 3)))))

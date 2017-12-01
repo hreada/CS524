@@ -37,13 +37,13 @@ module ACTOR-SYNTAX
 
   /* Expressions that are constructed using primitive operations. */
   
-  syntax Exp  ::= "isatom"  "(" Exp                 ")"
-                | "isnat"   "(" Exp                 ")"
-                | "ispr"    "(" Exp                 ")" 
+  syntax Exp  ::= "isatom"  "(" Exp                 ")" [function]
+                | "isnat"   "(" Exp                 ")" [function]
+                | "ispr"    "(" Exp                 ")" [function]
                 | "br"      "(" Exp "," Exp "," Exp ")" [strict(1)]
-                | "pr"      "(" Exp "," Exp         ")" 
-                | "fst"     "(" Exp                 ")" 
-                | "snd"     "(" Exp                 ")" 
+                | "pr"      "(" Exp "," Exp         ")" [strict]
+                | "fst"     "(" Exp                 ")" [function]
+                | "snd"     "(" Exp                 ")" [function]
                 | "newadr"  "("                     ")" 
                 | "initbeh" "(" Exp "," Exp         ")" 
                 | "send"    "(" Exp "," Exp         ")" 
@@ -64,18 +64,17 @@ module ACTOR-SYNTAX
   syntax Bindings ::= List{Binding, ","}
 
   /* Expressions that are constructed using more operations. */
-  syntax Exp ::= "mkset" "(" Exp ")"
-               | "mkget" "(" Exp ")"
-               | "set?"  "(" Exp ")"
-               | "get?"  "(" Exp ")"
-               | "eq?"   "(" Exp "," Exp ")" [strict]
-               | "left"  "(" Exp ")"
-               | "right" "(" Exp ")"
-               | "cust"  "(" Exp ")"
-  
-  /* User-defined actor behavior as expressions. */
-  syntax Exp ::= "treeprod"
-               | "joincont"
+  syntax Exp ::= "mkset" "(" Exp ")"         [function]
+               | "mkget" "(" Exp ")"         [function]
+               | "set?"  "(" Exp ")"         [function]
+               | "get?"  "(" Exp ")"         [function]
+               | "eq?"   "(" Exp "," Exp ")" [function]
+               | "left"  "(" Exp ")"         [function]
+               | "right" "(" Exp ")"         [function]
+               | "cust"  "(" Exp ")"         [function]
+               | "add"   "(" Exp "," Exp ")" [function]
+               | "minus" "(" Exp "," Exp ")" [function]
+               | "le"    "(" Exp "," Exp ")" [function]
                
   /* Message */
   syntax Message ::= "msg" "(" Val "," Val ")"  // message < lhs <= rhs >
@@ -135,6 +134,17 @@ module ACTOR
        let(bind(X2, newadr()),
          seq(initbeh(X1, E1),
          seq(initbeh(X2, E2), E))))
+  rule letactor(
+         (bind(X1:Id, E1:Exp),
+          bind(X2:Id, E2:Exp),
+          bind(X3:Id, E3:Exp)),
+         E:Exp)
+    => let(bind(X1, newadr()),
+       let(bind(X2, newadr()),
+       let(bind(X3, newadr()),
+         seq(initbeh(X1, E1),
+         seq(initbeh(X2, E2),
+         seq(initbeh(X3, E3), E))))))
          
   /* Reduction rule for fixed-point combinator (I wrote it by myself) */
   
@@ -150,6 +160,10 @@ module ACTOR
   rule app(lambda(X:Id, E:Exp), V:Val) => E[V / X]
   
   /* (delta) rules are defined for each operators */
+  rule add(  M:Int, N:Int)    => M +Int N
+  rule minus(M:Int, N:Int)    => M -Int N
+  rule le(   M:Int, N:Int)    => t        requires M <=Int N
+  rule le(   M:Int, N:Int)    => nil      requires M >Int N
   
   /* (br) FIXME consider known addresses */
   rule br(nil  , V1:Val, V2:Val) => V2
