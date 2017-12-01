@@ -1,28 +1,5 @@
-/*
- * Important Syntactic Catogories in the Actor Lanaguage 
- * (and their notations in the paper)
- * - Variables            (X)
- * - Atoms                (At)
- *     t  : boolean atom
- *     nil: boolean atom
- *     N  : natural numbers
- * - Primitive operations (F)
- *     Operations on atoms  (G)
- *     Arithmetic operations
- *     isatom       : recognizer for atoms
- *     isnat        : recognizer for natural numbers
- *     ispr         : recognizer for pairs
- *     br           : brancing (arity 3)
- *     pr           : pairing
- *     first, second: getters
- *     newadr       : actor primitive
- *     initbeh      : actor primitive
- *     send         : actor primitive
- *     become       : actor primitive
- * - Expressions (E)
- * - Values      (V)
- * - Contexts    (C)
- *
+/* Let us use prefix forms for everything because I am tired of parsing
+ * ambiguities.
  */
 
 require "substitution.k"
@@ -40,9 +17,9 @@ module ACTOR-SYNTAX
   /* Values are terms that cannot rewrite anymore. */
 
   syntax Val  ::= Atm
-                | Id                          // variables
-                | "\\" Id "." Exp [binder]    // lambda abstraction
-                | PairVal                     // pairs
+                | Id                                    // variables
+                | "lambda" "(" Id "," Exp ")" [binder]  // lambda abstraction
+                | PairVal                               // pairs
   syntax PairVal ::= "pr" "(" Val "," Val ")"
 
   /* Expressions */
@@ -72,18 +49,14 @@ module ACTOR-SYNTAX
    * to expressions with primitive operations
    */
   syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")" 
-                | "let" "{" Binding "}" Exp
+                | "let" "(" Binding "," Exp ")"
                 | "seq" "(" Exp "," Exp ")"
-                | "letactor" "{" Bindings "}" Exp
+                | "letactor" "(" Bindings "," Exp ")"
 
   /* Bindings and lists of bindings */
   
-  syntax Binding  ::= Id ":=" Exp
+  syntax Binding  ::= "bind" "(" Id "," Exp ")"
   syntax Bindings ::= List{Binding, ","}
-
-  /* Meta-level information for rewriting */
-  syntax KVariable ::= Id
-  syntax KResult   ::= Val
 
   /* Expressions that are constructed using more operations. */
   syntax Exp ::= "mkset" "(" Exp ")"
@@ -100,30 +73,35 @@ module ACTOR-SYNTAX
                | "joincont"
                
   /* Message */
-  syntax Message ::= "<" Val "<=" Val ">"
+  syntax Message ::= "msg" "(" Val "," Val ")"  // message < lhs <= rhs >
   
   /* Actor states */
-  syntax AState  ::= "(" "?" Id ")"
-                   | "(" Val ")"
-                   | "[" Exp "]"    [strict]
+  syntax AState  ::= "uninit" "(" Id  ")"            // (?a) uninitialized
+                   | "ready"  "(" Val ")"            // (b)  ready to accept msg
+                   | "exec"   "(" Exp ")"  [strict]  // [e]  busy executing e
                    
   /* Communication values */
   syntax CVal    ::= Atm
                    | Id
                    | "pr" "(" CVal "," CVal ")"
 
+  /* Meta-level information for rewriting */
+  syntax KVariable ::= Id
+  syntax KResult   ::= Val
+                     | CVal
+  
 endmodule
 
 module ACTOR
 
   imports ACTOR-SYNTAX
   
-  syntax Id ::= "a"
+  syntax Id ::= "a" // the id of actor in the initial configuration
 
   configuration <T color="red">
                   <actors color="orange">
                     <actor multiplicity="*" color="yellow">
-                      <k color="green"> [ $PGM:Exp ] </k>
+                      <k color="green"> exec($PGM:Exp) </k>
 		      <id> a </id>
                     </actor>
                   </actors>
@@ -136,33 +114,33 @@ module ACTOR
   /* Desugar rules for syntactic sugar (page 15) */
   
   rule if(E0:Exp, E1:Exp, E2:Exp)
-    => app(br(E0, \!Z.E1, \!Z.E2), nil)
+    => app(br(E0, lambda(!Z, E1), lambda(!Z, E2)), nil)
    
-  rule let{X:Id := E0:Exp} E1
-    => app(\X.E1, E0)
+  rule let(bind(X:Id, E0:Exp), E1)
+    => app(lambda(X, E1), E0)
     
   rule seq(E0:Exp, E1:Exp)
-    => app(app(\!Z.\!X.!X, E0), E1)
+    => app(app(lambda(!Z, lambda(!X, !X)), E0), E1)
   
-  rule letactor{.Bindings} E:Exp
+  rule letactor(.Bindings, E:Exp)
     => E:Exp
-  rule letactor{X1:Id := E1:Exp} E:Exp
-    => let{X1 := newadr()}
-         seq(initbeh(X1, E1), E)
-  rule letactor{X1:Id := E1:Exp, X2:Id := E2:Exp} E:Exp // FIXME
-    => let{X1 := newadr()} let{X2 := newadr()}
+  rule letactor(bind(X1:Id, E1:Exp), E:Exp)
+    => let(bind(X1, newadr()),
+         seq(initbeh(X1, E1), E))
+  rule letactor((bind(X1:Id, E1:Exp), bind(X2:Id, E2:Exp)), E:Exp) // FIXME
+    => let(bind(X1, newadr()),
+       let(bind(X2, newadr()),
          seq(initbeh(X1, E1),
-         seq(initbeh(X2, E2), E))
+         seq(initbeh(X2, E2), E))))
          
   /* Reduction rule for fixed-point combinator (I wrote it by myself) */
   
-  rule rec(\B:Id . E:Exp) => E[rec(\B.E) / B] [structural]
+  rule rec(lambda(B:Id, E:Exp)) => E[rec(lambda(B, E)) / B] [structural]
 
   /* Reduction rules of expressions (page 18) */
   
   /* (beta-v) */
-  rule app(\X:Id . E:Exp, V:Val) 
-    => E[V / X]
+  rule app(lambda(X:Id, E:Exp), V:Val) => E[V / X]
   
   /* (delta) rules are defined for each operators */
   
@@ -188,28 +166,35 @@ module ACTOR
   
   /* Transition rules for configurations (page 19) */
   
-  /* <init : a, a'> */
-  rule <k> initbeh(A', V:Val) => nil </k>
-
-  /*     <actor>
-         <k> ( ? A ) => ( V ) </k>
-         <id> A' </id>
-       </actor> */
-
-
-       
-  
-  /* <new : a, a'> */
+  /* <init : a, a1> */
   rule <actor>
-         <k> newadr() => !A':Id ... </k>
+         <k> initbeh(A1, V:Val) => nil ... </k>
+         <id> A </id>
+       </actor>
+       <actor>
+         <k> uninit(A) => ready(V) ... </k>
+         <id> A1 </id>
+       </actor>
+  
+  /* <new : a, a1> */
+  rule <actor>
+         <k> newadr() => !A1:Id ... </k>
          <id> A </id>
        </actor>
        (.Bag => <actor>
-                  <k> ( ? A ) </k>
-                  <id> !A' </id>
+                  <k> uninit(A) </k>
+                  <id> !A1 </id>
                 </actor>)
-       <definedaddr> Ads => Ads ListItem(!A') </definedaddr>
+       <definedaddr> Ads => Ads ListItem(!A1) </definedaddr>
 
+  /* <send : a, m> */
+  rule <actor>
+         <k> send(V0:Val, V1:Val) => nil ... </k>
+         <id> A </id>
+       </actor>
+       <messages>
+         .List => ListItem( msg(V0, V1) ) ...
+       </messages>
   
 endmodule
 

@@ -1,1 +1,1 @@
-app(\x.if(eq?(x,1),2,3),0)
+app(lambda(x, if(eq?(x, 1), 2, 3)), 0)

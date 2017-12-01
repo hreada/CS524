@@ -1,1 +1,1 @@
-rec(\y.\x.seq(send(x,5),become(y)))
+rec(lambda(y, lambda(x, seq(send(x,5),become(y)))))

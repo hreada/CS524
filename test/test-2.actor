@@ -1,2 +1,3 @@
-letactor{Z := rec(\Y.\X.seq(send(X,5),become(Y)))}
-  send(Z,A)
+letactor(
+  bind(Z, rec(lambda(Y, lambda(X, seq(send(X,5),become(Y)))))),
+  send(Z,A))
