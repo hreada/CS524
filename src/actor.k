@@ -130,6 +130,7 @@ module ACTOR
   rule seq(E0:Exp, E1:Exp)
     => app(app(lambda(!Z, lambda(!X, !X)), E0), E1)
   
+  // FIXME
   rule letactor(.Bindings, E:Exp)
     => E:Exp
   rule letactor((bind(X1:Id, E1:Exp), BS:Bindings), E:Exp)
