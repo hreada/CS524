@@ -286,5 +286,8 @@ module ACTOR
          (<message> msg(A, CV:CVal) </message>) => .Bag
          ...
        </messages>
+
+  syntax Id ::= #id(String) [function]
+  rule #id(X:String) => #parseToken("Id@ID", X)
   
 endmodule

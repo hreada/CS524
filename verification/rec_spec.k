@@ -6,12 +6,12 @@ module EQUALITY-SPEC
       <actor>
         <k>
           letactor(
-            bind(#parseToken("Id@ACTOR-SYNTAX", "test"), rec(lambda(y, lambda(x, seq(send(x,5),become(y)))))),
-            send(test, initactor))
+            bind(#id("test"), rec(lambda(#id("y"), lambda(#id("x"), seq(send(#id("x"),5),become(#id("y"))))))),
+            send(#id("test"), #id("initactor")))
           =>
           nil ...
         </k>
-        <id> initactor </id>
+        <id> #id("initactor") </id>
       </actor>
       (.Bag => _)
     </actors>
