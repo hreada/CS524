@@ -1,5 +1,5 @@
-/* Let us use prefix forms for everything because I am tired of parsing
- * ambiguities.
+/* A Formal Semantics for an Actor Language.
+ * Reference: Gul Agha et al, A Foundation for Actor Computation, 1997
  */
 
 require "substitution.k"
@@ -130,12 +130,38 @@ module ACTOR
   rule seq(E0:Exp, E1:Exp)
     => app(app(lambda(!Z, lambda(!X, !X)), E0), E1)
   
-  // FIXME
-  rule letactor(.Bindings, E:Exp)
-    => E:Exp
-  rule letactor((bind(X1:Id, E1:Exp), BS:Bindings), E:Exp)
-    => let(bind(X1, newadr()),
-         letactor(BS, E))
+  /* letactor(bind(x1,e1),...,bind(xn,en), e)
+   * => let(bind(x1,newadr()),
+   *    let(bind(x2,newadr()),
+   *    ...
+   *    let(bind(xn,newadr()),
+   *      seq(initbeh(x1,e1),
+   *      seq(initbeh(x2,e2),
+   *      ...
+   *      seq(initbeh(xn,en), e))))))
+   * Auxilliary functions are defined to help us rewrite it
+   */
+  rule letactor(BS:Bindings, E:Exp)
+    => letactor-aux(BS:Bindings, E:Exp, BS:Bindings)
+  
+  rule letactor-aux(
+         bind(X1:Id, E1:Exp), RestBS:Bindings,
+         E:Exp,
+         AllBS:Bindings)
+    => let(bind(X1, newadr()), letactor-aux(RestBS, E, AllBS))
+  
+  rule letactor-aux(
+         .Bindings,
+         E:Exp,
+         bind(X1:Id, E1:Exp), RestBS:Bindings)
+    => seq(initbeh(X1, E1), letactor-aux(.Bindings, E, RestBS))
+  
+  rule letactor-aux(
+         .Bindings,
+         E:Exp,
+         .Bindings)
+    => E
+  syntax Exp ::= "letactor-aux" "(" Bindings "," Exp "," Bindings ")"
          
   /* Reduction rules for the fixed-point combinator (I wrote it by myself) */
   
