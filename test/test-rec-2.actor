@@ -1,0 +1,3 @@
+letactor(
+  bind(test, rec(lambda(y, lambda(x, seq(send(x,5),become(y)))))),
+  send(test, initactor))
