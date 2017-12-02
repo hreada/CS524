@@ -76,6 +76,7 @@ module ACTOR-SYNTAX
                | "tree"  "(" Exp ")"         [seqstrict]
                | "left"  "(" Exp ")"         [seqstrict]
                | "right" "(" Exp ")"         [seqstrict]
+               | "isnat" "(" Exp ")"         [seqstrict]
                | "add"   "(" Exp "," Exp ")" [seqstrict]
                | "minus" "(" Exp "," Exp ")" [seqstrict]
                | "mult"  "(" Exp "," Exp ")" [seqstrict]
@@ -200,6 +201,8 @@ module ACTOR
   rule cust(pr(Tree:Val, Cust:Val)) => Cust
   rule left (Tree:Val)              => fst(Tree)
   rule right(Tree:Val)              => snd(Tree)
+  rule isnat(M:Int)                 => t
+  rule isnat(pr(V1:Val, V2:Val))    => nil
   
   /* (br) */
   rule br(nil  , V1:Val, V2:Val) => V2

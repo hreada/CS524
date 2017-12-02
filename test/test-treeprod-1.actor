@@ -17,9 +17,9 @@ let(bind(treeprod,
              seq(send(self, pr(left(tree(m)), newcust)),
                  send(self, pr(right(tree(m)), newcust))))))))))),
 let(bind(tr, 
-  pr(0, pr(1, 2))),
+  pr(pr(1, pr(2, pr(3, 4))), pr(pr(5, 6), 7))),
 letactor(
-  bind(tpactor, treeprod),
+  bind(tpactor, app(treeprod, tpactor)),
   bind(custactor, dummy),
   send(tpactor, pr(tr, custactor))))))))
 
