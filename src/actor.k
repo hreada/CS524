@@ -47,7 +47,7 @@ module ACTOR-SYNTAX
   syntax Exp  ::= "isatom"  "(" Exp                 ")" [seqstrict]
                 | "isnat"   "(" Exp                 ")" [seqstrict]
                 | "ispr"    "(" Exp                 ")" [seqstrict]
-                | "br"      "(" Exp "," Exp "," Exp ")" [strict(1)]
+                | "br"      "(" Exp "," Exp "," Exp ")" [seqstrict] // [strict(1)]
                 | "pr"      "(" Exp "," Exp         ")" [seqstrict]
                 | "fst"     "(" Exp                 ")" [seqstrict]
                 | "snd"     "(" Exp                 ")" [seqstrict]
@@ -81,6 +81,8 @@ module ACTOR-SYNTAX
                | "minus" "(" Exp "," Exp ")" [seqstrict]
                | "mult"  "(" Exp "," Exp ")" [seqstrict]
                | "le"    "(" Exp "," Exp ")" [seqstrict]
+               | "and"   "(" Exp "," Exp ")" [seqstrict]
+               | "or"    "(" Exp "," Exp ")" [seqstrict]
                
   /* Message */
   /* Messages are not syntactically restricted to be of the form
@@ -105,10 +107,10 @@ module ACTOR
   
   syntax Id ::= "initactor" // the id of the initial actor
 
-  configuration <T color="red">
-                  <actors color="orange">
-                    <actor multiplicity="*" color="yellow">
-                      <k color="green"> exec($PGM:Exp) </k>
+  configuration <T>
+                  <actors>
+                    <actor multiplicity="*">
+                      <k> exec($PGM:Exp) </k>
 		      <id> initactor </id>
                     </actor>
                   </actors>
@@ -118,8 +120,8 @@ module ACTOR
                     </message>
                   </messages>
                   <definedaddr> ListItem(initactor) </definedaddr>
-                  <ext> .List </ext>
-		  <recep> .List </recep>
+                  // <ext> .List </ext>
+		  // <recep> .List </recep>
                 </T>
   
   /* Desugaring rules for syntactic sugar (page 15) */
@@ -127,7 +129,7 @@ module ACTOR
   rule if(E0:Exp, E1:Exp, E2:Exp)
     => app(br(E0, lambda(!Z, E1), lambda(!Z, E2)), nil)
    
-  rule let(bind(X:Id, E0:Exp), E1)
+  rule let(bind(X:Id, E0:Exp), E1:Exp)
     => app(lambda(X, E1), E0)
     
   rule seq(E0:Exp, E1:Exp)
@@ -175,12 +177,12 @@ module ACTOR
   rule letactor-aux(.Bindings, E:Exp, .Bindings) // both args are empty
     => E
          
-  /* Reduction rules for the fixed-point combinator (I wrote it by myself) */
+  /* Reduction rules for the fixed-point combinator (not in paper) */
   
   rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
     => app(subst(E1, rec(lambda(B, E1)), B), E2)
     
-  syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")" // needed for parsing
+  syntax Exp ::= "subst" "(" K "," K "," K ")" // needed for parsing
   rule subst(K1, K2, K3) => K1 [ K2 / K3 ]
 
   /* Reduction rules of expressions (page 18) */
@@ -194,6 +196,12 @@ module ACTOR
   rule mult( M:Int, N:Int)    => M *Int N
   rule le(   M:Int, N:Int)    => t        requires M <=Int N
   rule le(   M:Int, N:Int)    => nil      requires M >Int N
+
+  rule and(nil, V:Val) => nil
+  rule and(t,   V:Val) => V
+  rule or( t,   V:Val) => t
+  rule or( nil, V:Val) => V
+
   /* See page 11. Messages are pairs of a tree and an address.
    * Trees are nested pairs.
    */
@@ -290,6 +298,7 @@ module ACTOR
          ...
        </messages>
 
+  // Helper for creating ids, used in verification
   syntax Id ::= #id(String) [function]
   rule #id(X:String) => #parseToken("Id@ID", X)
   

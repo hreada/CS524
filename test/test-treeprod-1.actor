@@ -1,6 +1,6 @@
 let(bind(sink,
   rec(lambda(b, lambda(m, become(b))))),
-let(bind(dummy,
+let(bind(ident,
   lambda(m, m)),
 let(bind(joincont,
   rec(lambda(b, lambda(c, lambda(nargs, lambda(firstnum, lambda(num,
@@ -20,6 +20,6 @@ let(bind(tr,
   pr(pr(1, pr(2, pr(3, 4))), pr(pr(5, 6), 7))),
 letactor(
   bind(tpactor, app(treeprod, tpactor)),
-  bind(custactor, dummy),
+  bind(custactor, ident),
   send(tpactor, pr(tr, custactor))))))))
 
