@@ -5,5 +5,6 @@ for file in `ls *.actor`;
     printf "Running $file\n"
     krun -d ../src $file > temp.xml
     xmllint --format temp.xml | tail -n +2
+    printf "\n"
     rm temp.xml
 done;
