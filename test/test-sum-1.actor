@@ -1,0 +1,2 @@
+app(rec(lambda(sum, lambda(n,
+      if(eq?(n, 0), 0, add(app(sum, minus(n, 1)), n))))), 7)
