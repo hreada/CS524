@@ -4,14 +4,27 @@ module SUM-SPEC
   rule
     <actors>
       <actor>
-        <k> app(rec(lambda(#id("sum"), lambda(#id("n"),
-                  if(eq?(#id("n"), 0), 0, add(app(#id("sum"), minus(#id("n"), 1)), #id("n")))))),
-                minus(5, 1))
-            => (5 *Int (5 -Int 1)) /Int 2 ...
+        <k> app(app(rec(lambda(#id("sum"), lambda(#id("n"), lambda(#id("s"),
+                  if(eq?(#id("n"), 0), #id("s"), app(app(#id("sum"), minus(#id("n"), 1)), add(#id("n"), #id("s")))))))),
+                N:Int), 0)
+            => N *Int (N +Int 1) /Int 2
         </k>
         <id> initactor </id>
       </actor>
     </actors>
-    // requires X >Int 2
+    requires N >=Int 0
+
+  rule
+    <actors>
+      <actor>
+        <k> app(app(rec(lambda(#id("sum"), lambda(#id("n"), lambda(#id("s"),
+                  if(eq?(#id("n"), 0), #id("s"), app(app(#id("sum"), minus(#id("n"), 1)), add(#id("n"), #id("s")))))))),
+                minus(N:Int, 1)), add(N, S:Int))
+            => N *Int (N +Int 1) /Int 2 +Int S
+        </k>
+        <id> initactor </id>
+      </actor>
+    </actors>
+    requires N >Int 0
 
 endmodule
