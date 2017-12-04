@@ -288,6 +288,18 @@ module ACTOR
                 </actor>)
        <definedaddr> Ads => Ads ListItem(!A1) </definedaddr>
 
+  /* Alternatively:
+   * rule <actor>
+   *        <k> (become(V:Val) ~> RestComputation) => ready(V) </k>
+   *        ...
+   *      </actor>
+   *      (.Bag => <actor>
+   *                 <k> nil ~> RestComputation </k>
+   *                 <id> !A1:Id </id>
+   *               </actor>)
+   *      <definedaddr> Ads => Ads ListItem(!A1) </definedaddr>
+   */
+
 
   /* <send : a, m> */
   rule <actor>
