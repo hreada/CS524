@@ -9,34 +9,35 @@ module ACTOR-SYNTAX
   imports SUBSTITUTION
   
   /* Values are terms that cannot rewrite anymore.
-   * There are some main sub-categories of values.
+   * There are some main sub-categories of values
+   * which we introduce them here.
    * Atoms are values that can be checked whether equal or not.
    * Comminication values are values that can be received in messages.
    */
   
-  /* Atoms */  
+  /* Atoms (page 14) */  
   syntax Atm  ::= Int
                 | "t"    // the boolean true  in our actor language
                 | "nil"  // the boolean false in our actor language
   
-  /* Communication values */
+  /* Communication values (page 17) */
   syntax CVal ::= Atm
                 | Id                            // variables
                 | "pr" "(" CVal "," CVal ")"    // pairs of CVal
   
-  /* Values */
+  /* Values (page 14) */
   syntax Val  ::= CVal                                    
                 | "lambda" "(" Id "," Exp ")" [binder]  // lambda abstraction
                 | "pr" "(" Val "," Val ")"              // pairs of Val
   
-  /* Call-by-value fixed-point combinator.
+  /* Call-by-value fixed-point combinator (page 9).
    * It is regarded as a value. We only unfold it once
    * when it is applied to an argument.
    */
   syntax Val  ::= "rec" "(" Exp ")"
   
   
-  /* Expressions */
+  /* Expressions (page 15) */
   
   syntax Exp  ::= Val   // values
   
@@ -67,7 +68,9 @@ module ACTOR-SYNTAX
   syntax Binding  ::= "bind" "(" Id "," Exp ")"  // Id := Exp
   syntax Bindings ::= List{Binding, ","}
 
-  /* Expressions constructed with user-defined functions. */
+  /* Expressions constructed with user-defined functions.
+   * All of them are evaluated from left to right (page 18)
+   */
   syntax Exp ::= "mkset" "(" Exp ")"         [seqstrict]
                | "mkget" "(" Exp ")"         [seqstrict]
                | "set?"  "(" Exp ")"         [seqstrict]
@@ -83,21 +86,21 @@ module ACTOR-SYNTAX
                | "le"    "(" Exp "," Exp ")" [seqstrict]
                | "and"   "(" Exp "," Exp ")" [seqstrict]
                | "or"    "(" Exp "," Exp ")" [seqstrict]
-               
+
+  /* Actor states (page 16, 17) */
+  syntax AState  ::= "uninit" "(" Id  ")"            // (?a) uninitialized
+                   | "ready"  "(" Val ")"            // (b)  ready to accept msg
+                   | "exec"   "(" Exp ")"  [strict]  // [e]  busy executing e
+                   
   /* Message */
   /* Messages are not syntactically restricted to be of the form
    * <Ad <= cV> (page 17).
    */
   syntax Message ::= "msg" "(" Val "," Val ")"  // < lhs <= rhs >
-                   
-  /* Actor states (page 16) */
-  syntax AState  ::= "uninit" "(" Id  ")"            // (?a) uninitialized
-                   | "ready"  "(" Val ")"            // (b)  ready to accept msg
-                   | "exec"   "(" Exp ")"  [strict]  // [e]  busy executing e
 
-  /* Meta-level information for rewriting strategies */
-  syntax KVariable ::= Id
-  syntax KResult   ::= Val
+  /* Meta-level information */
+  syntax KVariable ::= Id   // for binding (in lambda abstraction)
+  syntax KResult   ::= Val  // for rewriting strategy
   
 endmodule
 
@@ -107,33 +110,37 @@ module ACTOR
   
   syntax Id ::= "initactor" // the id of the initial actor
 
+  /* Actor configuration (page 17) */
   configuration <T>
                   <actors>
-                    <actor multiplicity="*">
-                      <k> exec($PGM:Exp) </k>
-		      <id> initactor </id>
+                    <actor multiplicity="*">     // a multiset of actors
+                      <k> exec($PGM:Exp) </k>    // actor state
+		      <id> initactor </id>       // actor id
                     </actor>
                   </actors>
                   <messages>
-                    <message  multiplicity="*">
+                    <message  multiplicity="*">  // a multiset of messages
                       .K
                     </message>
                   </messages>
-                  <definedaddr> ListItem(initactor) </definedaddr>
-                  // <ext> .List </ext>
-		  // <recep> .List </recep>
+                  <definedaddr>                  // list of defined actors'
+                    ListItem(initactor)          // addresses
+                  </definedaddr>
+                  // <ext> .List </ext>          // external actors
+		  // <recep> .List </recep>      // receptionists
                 </T>
+
   
   /* Desugaring rules for syntactic sugar (page 15) */
   
   rule if(E0:Exp, E1:Exp, E2:Exp)
-    => app(br(E0, lambda(!Z, E1), lambda(!Z, E2)), nil)
+    => app(br(E0, lambda(!Z, E1), lambda(!Z, E2)), nil) // !Z fresh
    
   rule let(bind(X:Id, E0:Exp), E1:Exp)
     => app(lambda(X, E1), E0)
     
   rule seq(E0:Exp, E1:Exp)
-    => app(app(lambda(!Z, lambda(!X, !X)), E0), E1)
+    => app(app(lambda(!Z, lambda(!X, !X)), E0), E1)     // !X fresh
   
   /* letactor(bind(x1,e1),...,bind(xn,en), e)
    * => let(bind(x1,newadr()),
@@ -176,39 +183,41 @@ module ACTOR
   
   rule letactor-aux(.Bindings, E:Exp, .Bindings) // both args are empty
     => E
+    
          
   /* Reduction rules for the fixed-point combinator (not in paper) */
   
   rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
     => app(subst(E1, rec(lambda(B, E1)), B), E2)
     
-  syntax Exp ::= "subst" "(" K "," K "," K ")" // needed for parsing
-  rule subst(K1, K2, K3) => K1 [ K2 / K3 ]
+  syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")" // needed for parsing
+  rule subst(K1, K2, K3) => K1 [ K2 / K3 ]  // reduce to builtin substitution
 
   /* Reduction rules of expressions (page 18) */
   
   /* (beta-v) */
-  rule app(lambda(X:Id, E:Exp), V:Val) => E[V / X]
+  rule app(lambda(X:Id, E:Exp), V:Val) => subst(E, V, X)
   
-  /* (delta) rules are defined for each operators */
-  rule add(  M:Int, N:Int)    => M +Int N
+  /* (delta) rules are defined for each functions */
+  rule add  (M:Int, N:Int)    => M +Int N
   rule minus(M:Int, N:Int)    => M -Int N
-  rule mult( M:Int, N:Int)    => M *Int N
-  rule le(   M:Int, N:Int)    => t        requires M <=Int N
-  rule le(   M:Int, N:Int)    => nil      requires M >Int N
+  rule mult (M:Int, N:Int)    => M *Int N
+  rule le   (M:Int, N:Int)    => t        requires M <=Int N
+  rule le   (M:Int, N:Int)    => nil      requires M >Int N
 
   rule and(nil, V:Val) => nil
-  rule and(t,   V:Val) => V
-  rule or( t,   V:Val) => t
-  rule or( nil, V:Val) => V
+  rule and(t  , V:Val) => V
+  rule or (t  , V:Val) => t
+  rule or (nil, V:Val) => V
 
-  /* See page 11. Messages are pairs of a tree and an address.
-   * Trees are nested pairs.
+  /* User-defined functions for the example of tree production (page 11).
+   * In that example, messages are pairs of a tree and a customer actor address.
+   * Trees are implemented as nested pairs.
    */
-  rule tree(pr(Tree:Val, Cust:Val)) => Tree
-  rule cust(pr(Tree:Val, Cust:Val)) => Cust
-  rule left (Tree:Val)              => fst(Tree)
-  rule right(Tree:Val)              => snd(Tree)
+  rule tree(pr(Tree:Val, Cust:Val)) => Tree // get the "tree" field of a message
+  rule cust(pr(Tree:Val, Cust:Val)) => Cust // get the "cust" field of a message
+  rule left (Tree:Val)              => fst(Tree) // get the left subtree
+  rule right(Tree:Val)              => snd(Tree) // get the right subtree
   rule isnat(M:Int)                 => t
   rule isnat(pr(V1:Val, V2:Val))    => nil
   
@@ -243,6 +252,8 @@ module ACTOR
   
   
   /* Transition rules for configurations (page 19) */
+  
+  /* <fun : a> is obtained for free by using K's strictness attributes. */
   
   /* <new : a, a1> */
   rule <actor>
