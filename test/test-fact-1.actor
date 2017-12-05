@@ -1,0 +1,3 @@
+app(rec(lambda(fact, lambda(n,
+      if(le(n, 1), 1, mult(app(fact, minus(n, 1)), n))))),
+    5)
