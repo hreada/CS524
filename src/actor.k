@@ -190,18 +190,12 @@ module ACTOR
          
   /* Reduction rules for the fixed-point combinator (not in paper) */
 
-  syntax Id ::= "$f" | "$x" | "$y"
+  syntax Id ::= "$x" | "$y"
   
-  // rule app(rec(lambda(B:Id, lambda(X:Id, E1:Exp))), E2:Exp)
-  //   => app(lambda(B, E2),
-  //          app(lambda($x, app(lambda(B, lambda(X, E1)), lambda($y, app(app($x, $x), $y)))),
-  //              lambda($x, app(lambda(B, lambda(X, E1)), lambda($y, app(app($x, $x), $y))))))
-
   rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
-    => app(subst(E1, rec(lambda(B, E1)), B), E2)
-    
-  syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")" // needed for parsing
-  rule subst(K1, K2, K3) => K1 [ K2 / K3 ]  // reduce to builtin substitution
+    => app(app(lambda($x, app(lambda(B, E1), lambda($y, app(app($x, $x), $y)))),
+               lambda($x, app(lambda(B, E1), lambda($y, app(app($x, $x), $y))))),
+           E2)
 
   /* beta-reduction - env based definition, not in paper */
 
