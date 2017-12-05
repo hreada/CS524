@@ -5,8 +5,8 @@ module SUM-SPEC
   rule
     <actors>
       <actor>
-        <k> app(app(rec(lambda(#id("sum"), lambda(#id("n"), lambda(#id("s"),
-                  if(eq?(#id("n"), 0), #id("s"), app(app(#id("sum"), minus(#id("n"), 1)), add(#id("n"), #id("s")))))))),
+        <k> app(app(rec(lambda(sum, lambda(n, lambda(s,
+                  if(eq?(n, 0), s, app(app(sum, minus(n, 1)), add(n, s))))))),
                 N:Int), 0)
             => N *Int (N +Int 1) /Int 2
         </k>
@@ -19,8 +19,8 @@ module SUM-SPEC
   rule
     <actors>
       <actor>
-        <k> app(app(rec(lambda(#id("sum"), lambda(#id("n"), lambda(#id("s"),
-                  if(eq?(#id("n"), 0), #id("s"), app(app(#id("sum"), minus(#id("n"), 1)), add(#id("n"), #id("s")))))))),
+        <k> app(app(rec(lambda(sum, lambda(n, lambda(s,
+                  if(eq?(n, 0), s, app(app(sum, minus(n, 1)), add(n, s))))))),
                 minus(N:Int, 1)), add(N, S:Int))
             => N *Int (N +Int 1) /Int 2 +Int S
         </k>

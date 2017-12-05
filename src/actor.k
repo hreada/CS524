@@ -321,8 +321,4 @@ module ACTOR
          ...
        </messages>
 
-  // Helper for creating ids, used in verification
-  syntax Id ::= #id(String) [function]
-  rule #id(X:String) => #parseToken("Id@ID", X)
-  
 endmodule
