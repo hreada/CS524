@@ -58,7 +58,7 @@ module ACTOR-SYNTAX
                 | "become"  "(" Exp                 ")" [seqstrict]
                 | "eq?"     "(" Exp "," Exp         ")" [seqstrict]
                 
-  /* Expressions that are syntactic sugar (page 15) */ 
+  /* Expressions that are syntactic sugar (page 15) */
   syntax Exp  ::= "if" "(" Exp "," Exp "," Exp ")" 
                 | "let" "(" Binding "," Exp ")"
                 | "seq" "(" Exp "," Exp ")"
