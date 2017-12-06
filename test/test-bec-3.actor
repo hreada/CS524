@@ -1,0 +1,11 @@
+let(
+  bind(append, 
+       rec(lambda(beh, lambda(current, lambda(new,
+         become(app(beh, pr(new, current)))))))),
+  letactor(
+    bind(a, app(append, nil)),
+    seq(send(a, 0),
+    seq(send(a, 1),
+    seq(send(a, 2),
+        send(a, 3))))))
+  

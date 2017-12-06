@@ -1,0 +1,4 @@
+app(rec(lambda(fib, lambda(n,
+      if(le(n, 2), 1, add(app(fib, minus(n, 1)),
+                          app(fib, minus(n, 2))))))),
+    7)

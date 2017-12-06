@@ -1,0 +1,4 @@
+rec(lambda(b, lambda(n,
+  if(le(n, 2), 1, add(app(b, minus(n, 1)),
+                      app(b, minus(n, 2)))))))
+

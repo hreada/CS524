@@ -1,0 +1,3 @@
+letactor(bind(dec, lambda(m, minus(m, 1))),
+         bind(a  , lambda(m, send(dec, 42))),
+         send(a, nil))
