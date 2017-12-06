@@ -185,18 +185,30 @@ module ACTOR
     => E
     
          
-  /* Reduction rules for the fixed-point combinator (not in paper) */
-  
+  /* Reduction rules for the fixed-point combinator
+   * (Z-combinator, not in paper)
+   */
+
+  syntax Id ::= "$x" | "$y"
+
   rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
-    => app(subst(E1, rec(lambda(B, E1)), B), E2)
+    => app(app(lambda($x, app(lambda(B, E1), lambda($y, app(app($x, $x), $y)))),
+               lambda($x, app(lambda(B, E1), lambda($y, app(app($x, $x), $y))))),
+           E2)
+
+  /* Alternatively, we could use K's builtin substitution */
+
+  // rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
+  //   => app(subst(E1, rec(lambda(B, E1)), B), E2)
     
-  syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")" // needed for parsing
-  rule subst(K1, K2, K3) => K1 [ K2 / K3 ]  // reduce to builtin substitution
+  // syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")" // needed for parsing
+  // rule subst(K1, K2, K3) => K1 [ K2 / K3 ]  // reduce to builtin substitution
+
 
   /* Reduction rules of expressions (page 18) */
   
   /* (beta-v) */
-  rule app(lambda(X:Id, E:Exp), V:Val) => subst(E, V, X)
+  rule app(lambda(X:Id, E:Exp), V:Val) => E [ V / X ]
   
   /* (delta) rules are defined for each functions */
   rule add  (M:Int, N:Int)    => M +Int N
