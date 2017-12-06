@@ -30,10 +30,7 @@ module ACTOR-SYNTAX
                 | "lambda" "(" Id "," Exp ")" [binder]  // lambda abstraction
                 | "pr" "(" Val "," Val ")"              // pairs of Val
   
-  /* Call-by-value fixed-point combinator (page 9). */
-  syntax Exp  ::= "rec" "(" Exp ")"
-  
-  
+
   /* Expressions (page 15) */
   
   syntax Exp  ::= Val   // values
@@ -60,6 +57,12 @@ module ACTOR-SYNTAX
                 | "let" "(" Binding "," Exp ")"
                 | "seq" "(" Exp "," Exp ")"
                 | "letactor" "(" Bindings "," Exp ")"
+
+  /* Call-by-value fixed-point combinator 
+   * (syntactic sugar for Z-combinator, page 9). 
+   */
+  syntax Exp  ::= "rec" "(" Exp ")"
+
 
   /* Bindings and lists of bindings */
   syntax Binding  ::= "bind" "(" Id "," Exp ")"  // Id := Exp
