@@ -196,11 +196,8 @@ module ACTOR
 
   /* Alternatively, we could use K's builtin substitution */
 
-  // rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
-  //   => app(subst(E1, rec(lambda(B, E1)), B), E2)
-    
-  // syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")" // needed for parsing
-  // rule subst(K1, K2, K3) => K1 [ K2 / K3 ]  // reduce to builtin substitution
+  // rule rec(lambda(B:Id, E:Exp))
+  //   => E [ rec(lambda(B, E) / B ]
 
 
   /* Reduction rules of expressions (page 18) */
