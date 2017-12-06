@@ -30,11 +30,8 @@ module ACTOR-SYNTAX
                 | "lambda" "(" Id "," Exp ")" [binder]  // lambda abstraction
                 | "pr" "(" Val "," Val ")"              // pairs of Val
   
-  /* Call-by-value fixed-point combinator (page 9).
-   * It is regarded as a value. We only unfold it once
-   * when it is applied to an argument.
-   */
-  syntax Val  ::= "rec" "(" Exp ")"
+  /* Call-by-value fixed-point combinator (page 9). */
+  syntax Exp  ::= "rec" "(" Exp ")"
   
   
   /* Expressions (page 15) */
@@ -189,12 +186,13 @@ module ACTOR
    * (Z-combinator, not in paper)
    */
 
-  syntax Id ::= "$x" | "$y"
-
-  rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
-    => app(app(lambda($x, app(lambda(B, E1), lambda($y, app(app($x, $x), $y)))),
-               lambda($x, app(lambda(B, E1), lambda($y, app(app($x, $x), $y))))),
-           E2)
+  rule rec(lambda(B:Id, E:Exp))
+    => app(lambda(!X:Id,
+             app(lambda(B, E),
+                 lambda(!Y:Id, app(app(!X, !X), !Y)))),
+           lambda(!X,
+             app(lambda(B, E),
+                 lambda(!Y, app(app(!X, !X), !Y)))))
 
   /* Alternatively, we could use K's builtin substitution */
 
