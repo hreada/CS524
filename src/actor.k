@@ -12,7 +12,7 @@ module ACTOR-SYNTAX
    * There are some main sub-categories of values
    * which we introduce them here.
    * Atoms are values that can be checked whether equal or not.
-   * Comminication values are values that can be received in messages.
+   * Communication values are values that can be received in messages.
    */
   
   /* Atoms (page 14) */  
