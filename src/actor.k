@@ -12,7 +12,7 @@ module ACTOR-SYNTAX
    * There are some main sub-categories of values
    * which we introduce them here.
    * Atoms are values that can be checked whether equal or not.
-   * Comminication values are values that can be received in messages.
+   * Communication values are values that can be received in messages.
    */
   
   /* Atoms (page 14) */  
@@ -30,13 +30,7 @@ module ACTOR-SYNTAX
                 | "lambda" "(" Id "," Exp ")" [binder]  // lambda abstraction
                 | "pr" "(" Val "," Val ")"              // pairs of Val
   
-  /* Call-by-value fixed-point combinator (page 9).
-   * It is regarded as a value. We only unfold it once
-   * when it is applied to an argument.
-   */
-  syntax Val  ::= "rec" "(" Exp ")"
-  
-  
+
   /* Expressions (page 15) */
   
   syntax Exp  ::= Val   // values
@@ -63,6 +57,12 @@ module ACTOR-SYNTAX
                 | "let" "(" Binding "," Exp ")"
                 | "seq" "(" Exp "," Exp ")"
                 | "letactor" "(" Bindings "," Exp ")"
+
+  /* Call-by-value fixed-point combinator 
+   * (syntactic sugar for Z-combinator, page 9). 
+   */
+  syntax Exp  ::= "rec" "(" Exp ")"
+
 
   /* Bindings and lists of bindings */
   syntax Binding  ::= "bind" "(" Id "," Exp ")"  // Id := Exp
@@ -189,20 +189,18 @@ module ACTOR
    * (Z-combinator, not in paper)
    */
 
-  syntax Id ::= "$x" | "$y"
-
-  rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
-    => app(app(lambda($x, app(lambda(B, E1), lambda($y, app(app($x, $x), $y)))),
-               lambda($x, app(lambda(B, E1), lambda($y, app(app($x, $x), $y))))),
-           E2)
+  rule rec(lambda(B:Id, E:Exp))
+    => app(lambda(!X:Id,
+             app(lambda(B, E),
+                 lambda(!Y:Id, app(app(!X, !X), !Y)))),
+           lambda(!X,
+             app(lambda(B, E),
+                 lambda(!Y, app(app(!X, !X), !Y)))))
 
   /* Alternatively, we could use K's builtin substitution */
 
-  // rule app(rec(lambda(B:Id, E1:Exp)), E2:Exp)
-  //   => app(subst(E1, rec(lambda(B, E1)), B), E2)
-    
-  // syntax Exp ::= "subst" "(" Exp "," Exp "," Exp ")" // needed for parsing
-  // rule subst(K1, K2, K3) => K1 [ K2 / K3 ]  // reduce to builtin substitution
+  // rule rec(lambda(B:Id, E:Exp))
+  //   => E [ rec(lambda(B, E) / B ]
 
 
   /* Reduction rules of expressions (page 18) */

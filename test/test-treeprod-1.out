@@ -1,0 +1,142 @@
+<T>
+  <actors>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _674 </id>
+    </actor>
+    <actor>
+      <k> ready ( lambda ( _20 , become ( lambda ( _21 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( _22 , become ( b ) ) ) , lambda ( _23 , app ( app ( _1 , _1 ) , _23 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( _24 , become ( b ) ) ) , lambda ( _25 , app ( app ( _1 , _1 ) , _25 ) ) ) ) ) , _21 ) ) ) ) ) </k>
+      <id> _93 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _138 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _241 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _670 </id>
+    </actor>
+    <actor>
+      <k> ready ( lambda ( _65 , become ( lambda ( _66 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( _67 , become ( b ) ) ) , lambda ( _68 , app ( app ( _1 , _1 ) , _68 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( _69 , become ( b ) ) ) , lambda ( _70 , app ( app ( _1 , _1 ) , _70 ) ) ) ) ) , _66 ) ) ) ) ) </k>
+      <id> _179 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _178 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _287 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _514 </id>
+    </actor>
+    <actor>
+      <k> ready ( lambda ( _112 , become ( lambda ( _113 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( _114 , become ( b ) ) ) , lambda ( _115 , app ( app ( _1 , _1 ) , _115 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( _116 , become ( b ) ) ) , lambda ( _117 , app ( app ( _1 , _1 ) , _117 ) ) ) ) ) , _113 ) ) ) ) ) </k>
+      <id> _187 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _232 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _278 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _324 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _427 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _471 </id>
+    </actor>
+    <actor>
+      <k> ready ( lambda ( _252 , become ( lambda ( _253 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( _254 , become ( b ) ) ) , lambda ( _255 , app ( app ( _1 , _1 ) , _255 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( _256 , become ( b ) ) ) , lambda ( _257 , app ( app ( _1 , _1 ) , _257 ) ) ) ) ) , _253 ) ) ) ) ) </k>
+      <id> _366 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _363 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _521 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _666 </id>
+    </actor>
+    <actor>
+      <k> ready ( lambda ( _298 , become ( lambda ( _299 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( _300 , become ( b ) ) ) , lambda ( _301 , app ( app ( _1 , _1 ) , _301 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( _302 , become ( b ) ) ) , lambda ( _303 , app ( app ( _1 , _1 ) , _303 ) ) ) ) ) , _299 ) ) ) ) ) </k>
+      <id> _371 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _418 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _464 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _508 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _564 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _620 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _662 </id>
+    </actor>
+    <actor>
+      <k> ready ( lambda ( _482 , become ( lambda ( _483 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( _484 , become ( b ) ) ) , lambda ( _485 , app ( app ( _1 , _1 ) , _485 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( _486 , become ( b ) ) ) , lambda ( _487 , app ( app ( _1 , _1 ) , _487 ) ) ) ) ) , _483 ) ) ) ) ) </k>
+      <id> _566 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _611 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _657 </id>
+    </actor>
+    <actor>
+      <k> ready ( lambda ( _623 , seq ( become ( app ( lambda ( _11 , app ( app ( lambda ( _10 , app ( lambda ( b , lambda ( self , lambda ( m , seq ( become ( app ( b , self ) ) , if ( isnat ( tree ( m ) ) , send ( cust ( m ) , tree ( m ) ) , letactor ( bind ( newcust , app ( app ( app ( lambda ( c , lambda ( nargs , lambda ( firstnum , lambda ( num , if ( eq? ( nargs , 0 ) , become ( app ( app ( app ( lambda ( _4 , app ( app ( lambda ( _3 , app ( lambda ( b , lambda ( c , lambda ( nargs , lambda ( firstnum , lambda ( num , if ( eq? ( nargs , 0 ) , become ( app ( app ( app ( b , c ) , 1 ) , num ) ) , seq ( become ( lambda ( m , become ( lambda ( _2 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) ) , _2 ) ) ) ) ) , send ( c , mult ( firstnum , num ) ) ) ) ) ) ) ) ) , lambda ( _4 , app ( app ( _3 , _3 ) , _4 ) ) ) ) , lambda ( _3 , app ( lambda ( b , lambda ( c , lambda ( nargs , lambda ( firstnum , lambda ( num , if ( eq? ( nargs , 0 ) , become ( app ( app ( app ( b , c ) , 1 ) , num ) ) , seq ( become ( lambda ( m , become ( lambda ( _2 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) ) , _2 ) ) ) ) ) , send ( c , mult ( firstnum , num ) ) ) ) ) ) ) ) ) , lambda ( _4 , app ( app ( _3 , _3 ) , _4 ) ) ) ) ) , _4 ) ) , c ) , 1 ) , num ) ) , seq ( become ( lambda ( m , become ( lambda ( _5 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _6 , app ( app ( _1 , _1 ) , _6 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _7 , app ( app ( _1 , _1 ) , _7 ) ) ) ) ) , _5 ) ) ) ) ) , send ( c , mult ( firstnum , num ) ) ) ) ) ) ) ) , cust ( m ) ) , 0 ) , nil ) ) , .Bindings , seq ( send ( self , pr ( left ( tree ( m ) ) , newcust ) ) , send ( self , pr ( right ( tree ( m ) ) , newcust ) ) ) ) ) ) ) ) ) , lambda ( _11 , app ( app ( _10 , _10 ) , _11 ) ) ) ) , lambda ( _10 , app ( lambda ( b , lambda ( self , lambda ( m , seq ( become ( app ( b , self ) ) , if ( isnat ( tree ( m ) ) , send ( cust ( m ) , tree ( m ) ) , letactor ( bind ( newcust , app ( app ( app ( lambda ( c , lambda ( nargs , lambda ( firstnum , lambda ( num , if ( eq? ( nargs , 0 ) , become ( app ( app ( app ( lambda ( _4 , app ( app ( lambda ( _3 , app ( lambda ( b , lambda ( c , lambda ( nargs , lambda ( firstnum , lambda ( num , if ( eq? ( nargs , 0 ) , become ( app ( app ( app ( b , c ) , 1 ) , num ) ) , seq ( become ( lambda ( m , become ( lambda ( _2 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) ) , _2 ) ) ) ) ) , send ( c , mult ( firstnum , num ) ) ) ) ) ) ) ) ) , lambda ( _4 , app ( app ( _3 , _3 ) , _4 ) ) ) ) , lambda ( _3 , app ( lambda ( b , lambda ( c , lambda ( nargs , lambda ( firstnum , lambda ( num , if ( eq? ( nargs , 0 ) , become ( app ( app ( app ( b , c ) , 1 ) , num ) ) , seq ( become ( lambda ( m , become ( lambda ( _2 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) ) , _2 ) ) ) ) ) , send ( c , mult ( firstnum , num ) ) ) ) ) ) ) ) ) , lambda ( _4 , app ( app ( _3 , _3 ) , _4 ) ) ) ) ) , _4 ) ) , c ) , 1 ) , num ) ) , seq ( become ( lambda ( m , become ( lambda ( _5 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _6 , app ( app ( _1 , _1 ) , _6 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( m , become ( b ) ) ) , lambda ( _7 , app ( app ( _1 , _1 ) , _7 ) ) ) ) ) , _5 ) ) ) ) ) , send ( c , mult ( firstnum , num ) ) ) ) ) ) ) ) , cust ( m ) ) , 0 ) , nil ) ) , .Bindings , seq ( send ( self , pr ( left ( tree ( m ) ) , newcust ) ) , send ( self , pr ( right ( tree ( m ) ) , newcust ) ) ) ) ) ) ) ) ) , lambda ( _11 , app ( app ( _10 , _10 ) , _11 ) ) ) ) ) , _11 ) ) , _45 ) ) , if ( isnat ( tree ( _623 ) ) , send ( cust ( _623 ) , tree ( _623 ) ) , letactor ( bind ( newcust , app ( app ( app ( lambda ( _624 , lambda ( nargs , lambda ( _625 , lambda ( _626 , if ( eq? ( nargs , 0 ) , become ( app ( app ( app ( lambda ( _627 , app ( app ( lambda ( _3 , app ( lambda ( b , lambda ( _628 , lambda ( nargs , lambda ( _629 , lambda ( _630 , if ( eq? ( nargs , 0 ) , become ( app ( app ( app ( b , _628 ) , 1 ) , _630 ) ) , seq ( become ( lambda ( _631 , become ( lambda ( _632 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( _633 , become ( b ) ) ) , lambda ( _634 , app ( app ( _1 , _1 ) , _634 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( _635 , become ( b ) ) ) , lambda ( _636 , app ( app ( _1 , _1 ) , _636 ) ) ) ) ) , _632 ) ) ) ) ) , send ( _628 , mult ( _629 , _630 ) ) ) ) ) ) ) ) ) , lambda ( _637 , app ( app ( _3 , _3 ) , _637 ) ) ) ) , lambda ( _3 , app ( lambda ( b , lambda ( _638 , lambda ( nargs , lambda ( _639 , lambda ( _640 , if ( eq? ( nargs , 0 ) , become ( app ( app ( app ( b , _638 ) , 1 ) , _640 ) ) , seq ( become ( lambda ( _641 , become ( lambda ( _642 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( _643 , become ( b ) ) ) , lambda ( _644 , app ( app ( _1 , _1 ) , _644 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( _645 , become ( b ) ) ) , lambda ( _646 , app ( app ( _1 , _1 ) , _646 ) ) ) ) ) , _642 ) ) ) ) ) , send ( _638 , mult ( _639 , _640 ) ) ) ) ) ) ) ) ) , lambda ( _647 , app ( app ( _3 , _3 ) , _647 ) ) ) ) ) , _627 ) ) , _624 ) , 1 ) , _626 ) ) , seq ( become ( lambda ( _648 , become ( lambda ( _5 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( _649 , become ( b ) ) ) , lambda ( _6 , app ( app ( _1 , _1 ) , _6 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( _650 , become ( b ) ) ) , lambda ( _7 , app ( app ( _1 , _1 ) , _7 ) ) ) ) ) , _5 ) ) ) ) ) , send ( _624 , mult ( _625 , _626 ) ) ) ) ) ) ) ) , cust ( _623 ) ) , 0 ) , nil ) ) , .Bindings , seq ( send ( _45 , pr ( left ( tree ( _623 ) ) , newcust ) ) , send ( _45 , pr ( right ( tree ( _623 ) ) , newcust ) ) ) ) ) ) ) ) </k>
+      <id> _45 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> initactor </id>
+    </actor>
+    <actor>
+      <k> exec ( 5040 ) </k>
+      <id> _46 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _91 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _527 </id>
+    </actor>
+  </actors>
+  <messages> .MessageCellBag </messages>
+  <definedaddr> ListItem ( initactor ) ListItem ( _45 ) ListItem ( _46 ) ListItem ( _91 ) ListItem ( _93 ) ListItem ( _138 ) ListItem ( _178 ) ListItem ( _179 ) ListItem ( _187 ) ListItem ( _232 ) ListItem ( _241 ) ListItem ( _278 ) ListItem ( _287 ) ListItem ( _324 ) ListItem ( _363 ) ListItem ( _366 ) ListItem ( _371 ) ListItem ( _418 ) ListItem ( _427 ) ListItem ( _464 ) ListItem ( _471 ) ListItem ( _508 ) ListItem ( _514 ) ListItem ( _521 ) ListItem ( _527 ) ListItem ( _564 ) ListItem ( _566 ) ListItem ( _611 ) ListItem ( _620 ) ListItem ( _657 ) ListItem ( _662 ) ListItem ( _666 ) ListItem ( _670 ) ListItem ( _674 ) </definedaddr>
+</T>
