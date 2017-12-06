@@ -1,0 +1,10 @@
+<T>
+  <actors>
+    <actor>
+      <k> exec ( lambda ( n , if ( le ( n , 2 ) , 1 , add ( app ( lambda ( _2 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( n , if ( le ( n , 2 ) , 1 , add ( app ( b , minus ( n , 1 ) ) , app ( b , minus ( n , 2 ) ) ) ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( n , if ( le ( n , 2 ) , 1 , add ( app ( b , minus ( n , 1 ) ) , app ( b , minus ( n , 2 ) ) ) ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) ) , _2 ) ) , minus ( n , 1 ) ) , app ( lambda ( _2 , app ( app ( lambda ( _1 , app ( lambda ( b , lambda ( n , if ( le ( n , 2 ) , 1 , add ( app ( b , minus ( n , 1 ) ) , app ( b , minus ( n , 2 ) ) ) ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) , lambda ( _1 , app ( lambda ( b , lambda ( n , if ( le ( n , 2 ) , 1 , add ( app ( b , minus ( n , 1 ) ) , app ( b , minus ( n , 2 ) ) ) ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) ) , _2 ) ) , minus ( n , 2 ) ) ) ) ) ) </k>
+      <id> initactor </id>
+    </actor>
+  </actors>
+  <messages> .MessageCellBag </messages>
+  <definedaddr> ListItem ( initactor ) </definedaddr>
+</T>

@@ -1,0 +1,10 @@
+<T>
+  <actors>
+    <actor>
+      <k> exec ( lambda ( x , seq ( send ( x , 5 ) , become ( lambda ( _2 , app ( app ( lambda ( _1 , app ( lambda ( y , lambda ( x , seq ( send ( x , 5 ) , become ( y ) ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) , lambda ( _1 , app ( lambda ( y , lambda ( x , seq ( send ( x , 5 ) , become ( y ) ) ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) ) , _2 ) ) ) ) ) ) </k>
+      <id> initactor </id>
+    </actor>
+  </actors>
+  <messages> .MessageCellBag </messages>
+  <definedaddr> ListItem ( initactor ) </definedaddr>
+</T>

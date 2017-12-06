@@ -1,0 +1,10 @@
+<T>
+  <actors>
+    <actor>
+      <k> exec ( t ) </k>
+      <id> initactor </id>
+    </actor>
+  </actors>
+  <messages> .MessageCellBag </messages>
+  <definedaddr> ListItem ( initactor ) </definedaddr>
+</T>

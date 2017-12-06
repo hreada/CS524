@@ -1,0 +1,20 @@
+<T>
+  <actors>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _10 </id>
+    </actor>
+    <actor>
+      <k> ready ( lambda ( _5 , app ( app ( lambda ( _4 , app ( lambda ( Y , lambda ( X , seq ( send ( X , 42 ) , become ( Y ) ) ) ) , lambda ( _5 , app ( app ( _4 , _4 ) , _5 ) ) ) ) , lambda ( _4 , app ( lambda ( Y , lambda ( X , seq ( send ( X , 42 ) , become ( Y ) ) ) ) , lambda ( _5 , app ( app ( _4 , _4 ) , _5 ) ) ) ) ) , _5 ) ) ) </k>
+      <id> _1 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> initactor </id>
+    </actor>
+  </actors>
+  <messages>
+    <message> msg ( A , 42 ) </message>
+  </messages>
+  <definedaddr> ListItem ( initactor ) ListItem ( _1 ) ListItem ( _10 ) </definedaddr>
+</T>

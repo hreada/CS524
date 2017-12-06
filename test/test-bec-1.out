@@ -1,0 +1,18 @@
+<T>
+  <actors>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> _4 </id>
+    </actor>
+    <actor>
+      <k> ready ( nil ) </k>
+      <id> _3 </id>
+    </actor>
+    <actor>
+      <k> ready ( lambda ( _2 , app ( app ( lambda ( _1 , app ( lambda ( y , become ( y ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) , lambda ( _1 , app ( lambda ( y , become ( y ) ) , lambda ( _2 , app ( app ( _1 , _1 ) , _2 ) ) ) ) ) , _2 ) ) ) </k>
+      <id> initactor </id>
+    </actor>
+  </actors>
+  <messages> .MessageCellBag </messages>
+  <definedaddr> ListItem ( initactor ) ListItem ( _3 ) ListItem ( _4 ) </definedaddr>
+</T>
