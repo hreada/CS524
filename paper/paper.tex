@@ -1,0 +1,50 @@
+% This is LLNCS.DEM the demonstration file of
+% the LaTeX macro package from Springer-Verlag
+% for Lecture Notes in Computer Science,
+% version 2.4 for LaTeX2e as of 16. April 2010
+%
+\documentclass{llncs}
+%
+\usepackage{makeidx}  % allows for indexgeneration
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+
+%
+\begin{document}
+%
+\mainmatter              % start of the contributions
+%
+\title{An Executable Formal Semantics For A Functional Actor Language}
+%
+\author{Xiaohong Chen, Lucas Pe\~{n}a}
+%
+\institute{University of Illinois at Urbana-Champaign, \\
+\email{\{xc3, lpena7\}@illinios.edu}}
+
+\maketitle              % typeset the title of the contribution
+
+\begin{abstract}
+A simple reference actor language has been proposed in~\cite{}, serving as a sound mathematical calculus foundation for various actor languages used in distributed applications that involves concurrency. Even though the authors of~\cite{} provided in the paper an operational semantics of the actor language, an executable implementation was not given. In this project, we will give the reference actor language an implementation that by construction conforms to its formal operational semantics using the K framework~\cite{}, a rule-based semantic framework. We will show that our executable formal semantics are capable of executing some meaningful actor systems examples. We hope our executable formal semantics can be served as a starting point for future work in developing automatic equivalence provers using K framework.
+\end{abstract}
+%
+\section{Introduction}
+\subsection{Related Work}
+
+\section{The Actor Language in K}
+\subsection{Configuration}
+\subsection{Syntax and Evaluation Contexts}
+\subsection{Semantics}
+\subsection{In-depth Example}
+
+\section{Conclusion and Future Work}
+
+%
+% ---- Bibliography ----
+%
+\bibliographystyle{ieeetr}
+
+\bibliography{references}
+
+\end{document}
