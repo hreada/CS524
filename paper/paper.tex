@@ -85,9 +85,53 @@ provide more assurance on K's language-defining ability, as well as open up to
 formal analysis using the tools seen in Figure~\ref{fig:k-tools}.
 
 \section{The Actor Language in K}
+
 \subsection{Configuration}
-\subsection{Syntax and Evaluation Contexts}
+
+\subsection{Syntax and Reduction Contexts}
+Syntax for constructs in K is specified using BNF notation. For example, we
+specify values (where reduction can no longer happen) as
+\begin{verbatim}
+  syntax Val  ::= CVal                                    
+                | "lambda" "(" Id "," Exp ")" [binder]
+                | "pr" "(" Val "," Val ")"
+\end{verbatim}
+where \texttt{CVal} represents the communicable values, \texttt{lambda}
+represents lambda expressions, and \texttt{pr} represents pairs of values.  The
+\texttt{binder} attribute is used in K's backend for substitution, as it
+specifies that \texttt{Id} is bound in the term \texttt{Exp}.
+
+In K, we can also use syntax to express contexts in which reduction is allowed.
+In the actor language, reduction contexts are separately defined to specify
+evaluation order of expressions. For example, the set of reduction contexts for
+functions in the actor language are specified as
+\[ \mathbb{F}_{n+m+1}(\mathbb{V}^n,\mathbb{R},\mathbb{E}^m) \]
+This states that the argument of a function can be evaluated only when the first
+$n$ arguments have already been evaluated. In K, this is simply specified using
+the attribute \texttt{seqstrict} which states the arguments of a syntactic
+construct are evaluated in order. Addition, for example, is specified in K as
+\begin{verbatim}
+syntax Exp ::= "add" "(" Exp "," Exp ")" [seqstrict]
+\end{verbatim}
+Note nothing beyond the appropriate strictness attribute is needed to specify
+reduction contexts in K for this language.
+
+For the branching, we would like to only specify that only the first argument
+should reduce to a value, to avoid reduction in the branch we end up not taking.
+In the actor semantics from~\cite{}, this is accomplished with the following:
+\[ \texttt{if}(e_0, e_1, e_2) \;\;\;\text{abbreviates}\;\;\; \texttt{app}(\texttt{br}(e_0, \lambda z.e_1, \lambda z.e_2), \texttt{nil}) \;\;\;\text{for $z$ fresh} \]
+Notice that the second and third arguments in the branch construct are lambda
+expressions, which are values, and thus will not be reduced any farther. In our
+K semantics, we emulate this, but we could also define \texttt{br} directly to
+be only strict in the first argument as follows:
+\begin{verbatim}
+syntax Exp ::= "br" "(" Exp "," Exp "," Exp ")" [strict(1)]
+\end{verbatim}
+Strictness constructs like this avoid unnecessary syntactic sugar, and cleanly
+specify most reduction contexts one would require.
+
 \subsection{Semantics}
+
 \subsection{In-depth Example}
 
 \section{Conclusion and Future Work}
