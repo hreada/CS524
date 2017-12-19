@@ -26,11 +26,63 @@
 \maketitle              % typeset the title of the contribution
 
 \begin{abstract}
-A simple reference actor language has been proposed in~\cite{}, serving as a sound mathematical calculus foundation for various actor languages used in distributed applications that involves concurrency. Even though the authors of~\cite{} provided in the paper an operational semantics of the actor language, an executable implementation was not given. In this project, we will give the reference actor language an implementation that by construction conforms to its formal operational semantics using the K framework~\cite{}, a rule-based semantic framework. We will show that our executable formal semantics are capable of executing some meaningful actor systems examples. We hope our executable formal semantics can be served as a starting point for future work in developing automatic equivalence provers using K framework.
+A simple reference actor language has been proposed in~\cite{}, serving as a
+sound mathematical calculus foundation for various actor languages used in
+distributed applications that involves concurrency. Even though the authors
+of~\cite{} provided in the paper an operational semantics of the actor language,
+an executable implementation was not given. In this project, we will give the
+reference actor language an implementation that by construction conforms to its
+formal operational semantics using the K framework~\cite{}, a rule-based
+semantic framework. We will show that our executable formal semantics are
+capable of executing some meaningful actor systems examples. We hope our
+executable formal semantics can be served as a starting point for future work in
+developing automatic equivalence provers using the K framework.
 \end{abstract}
 %
 \section{Introduction}
+The K framework~\cite{} is a framework for defining executable operational
+semantics of a programming language. K is based on rewriting logic, organizing
+the state of a program into cells and rewriting the particular parts of the
+configuration. K also has access the entire computation at any particular
+time. These features and more allow for difficult language constructs to be
+designed with ease in K. On top of that, K provides backend tooling for
+additional features based on the semantics of a programming language, such as a
+semantic debugger and a full formal verifier. See Figure~\ref{fig:k-tools} for a
+complete view of the tools one gets from K based off an operational semantics.
+
 \subsection{Related Work}
+
+\begin{figure}
+          \centering
+          \includegraphics[scale=0.13]{../k-overview.png}
+	  \caption{Backend tools K provides from just an operational
+            semantics. Some tools such as a semantics-based compiler and
+            test-case generation are in progress.}
+          \label{fig:k-tools}
+\end{figure}
+To demonstrate the power of K, languages as complex as C, Java, and JavaScript
+have been fully defined using the K framework~\cite{ , , }. On top of that, in
+all of these languages and more, nontrivial programs have been formally verified
+using K's prover, such as proofs involving AVL trees and red-black trees. We
+would like to add an actor-based language to the growing list of languages
+defined in K, so we can take advantage of K's formal verification engine and
+more.
+
+Semantics of actor-based languages have been defined on paper, for example
+in~\cite{}. Additionally, there are many implementations of actor-based systems,
+including Erlang~\cite{}, Akka~\cite{}, Scheme~\cite{}, and much more. However,
+there is currently no formally defined \textit{executable} operational semantics
+of an actor-based language. In K, there was previous work done to define the
+semantics of Orc, a concurrent programming language~\cite{}, though that work is
+incomplete.
+
+In this paper, we aim to define the semantics of the actor language proposed
+in~\cite{}.  We choose this language as the semantics are clearly defined in the
+paper, and it is one of the more simple actor frameworks. Defining this language
+in K will give assurance to the correctness of the language - as K is executable
+this can be tested much easier than defining a language on paper. It will also
+provide more assurance on K's language-defining ability, as well as open up to
+formal analysis using the tools seen in Figure~\ref{fig:k-tools}.
 
 \section{The Actor Language in K}
 \subsection{Configuration}
