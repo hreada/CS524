@@ -50,7 +50,12 @@ additional features based on the semantics of a programming language, such as a
 semantic debugger and a full formal verifier. See Figure~\ref{fig:k-tools} for a
 complete view of the tools one gets from K based off an operational semantics.
 
-\subsection{Related Work}
+In the rest of the paper we discuss related work, then the actor semantics in
+some detail, including the configuration, the syntax and how we handle reduction
+contexts in K, the semantics, and an in-depth example. We then conclude and
+discuss future work.
+
+\section{Related Work}
 
 \begin{figure}
           \centering
@@ -61,7 +66,7 @@ complete view of the tools one gets from K based off an operational semantics.
           \label{fig:k-tools}
 \end{figure}
 To demonstrate the power of K, languages as complex as C, Java, and JavaScript
-have been fully defined using the K framework~\cite{ , , }. On top of that, in
+have been fully defined using the K framework~\cite{c,java,jscript}. On top of that, in
 all of these languages and more, nontrivial programs have been formally verified
 using K's prover, such as proofs involving AVL trees and red-black trees. We
 would like to add an actor-based language to the growing list of languages
@@ -85,8 +90,50 @@ provide more assurance on K's language-defining ability, as well as open up to
 formal analysis using the tools seen in Figure~\ref{fig:k-tools}.
 
 \section{The Actor Language in K}
+In this section, we describe in detail some important features of the actor
+language from~\cite{}. We cover some important features from K and how they were
+used to define key concepts of the actor language.
 
 \subsection{Configuration}
+All languages in K use a configuration to specify the current state of a
+program. For simple languages like the lambda calculus or a simple \texttt{IMP}
+language, there may only be one cell to hold the current computation (the
+\texttt{k} cell) and perhaps another \texttt{env} cell for the current
+environment. For the actor language, we have the following configuration:
+\begin{verbatim}
+configuration 
+  <T>
+    <actors>
+      <actor multiplicity="*">     // a multiset of actors
+        <k> exec($PGM:Exp) </k>    // actor state
+        <id> initactor </id>       // actor id
+      </actor>
+    </actors>
+    <messages>
+      <message  multiplicity="*">  // a multiset of messages
+        .K
+      </message>
+    </messages>
+    <definedaddr>                  // list of defined actors'
+      ListItem(initactor)          // addresses
+    </definedaddr>
+  </T>
+\end{verbatim}
+In addition to defining the state of a program, the configuration is also used
+to define the initial state of a program. Initially, we only have one actor,
+with the unique identifier \texttt{initactor}. It also contains the program in
+the \texttt{exec} state ready to be executed. The variable \texttt{\$PGM} comes
+from an external file. The notation \texttt{multiplicity=*} is used to specify
+that there can be any number of \texttt{actor} cells and \texttt{message} cells
+as a multiset of actors and messages respectively. Initially there are no
+messages, represented using K's builtin \texttt{.K}. Finally, the
+\texttt{definedaddr} cell is used to keep track of addresses of defined
+actors. We need to keep track of this for the side condition of some semantic
+rules (see Section~\ref{sec:semantics}).
+
+For our K definition, we only define a single actor system, so there are no
+external actors or receptionists. To add these one can simply add these as
+additional cells in the configuration, initialized to the empty list.
 
 \subsection{Syntax and Reduction Contexts}
 Syntax for constructs in K is specified using BNF notation. For example, we
@@ -130,7 +177,7 @@ syntax Exp ::= "br" "(" Exp "," Exp "," Exp ")" [strict(1)]
 Strictness constructs like this avoid unnecessary syntactic sugar, and cleanly
 specify most reduction contexts one would require.
 
-\subsection{Semantics}
+\subsection{Semantics}\label{sec:semantics}
 
 \subsection{In-depth Example}
 
