@@ -95,12 +95,12 @@ language from~\cite{actor}. We cover some important features from K and how
 they were
 used to define key concepts of the actor language.
 
-\subsection{Configuration}
+\subsection{Configuration}\label{sec:configuration}
 All languages in K use a configuration to specify the current state of a
 program. For simple languages like the lambda calculus or a simple \texttt{IMP}
 language, there may only be one cell to hold the current computation (the
-\texttt{k} cell) and perhaps another \texttt{env} cell for the current
-environment. For the actor language, we have the following configuration:
+\texttt{<k>}\ \dots\ \texttt{</k>} cell) which is required for all languages
+defined in K. For the actor language, we have the following configuration:
 \begin{verbatim}
 configuration 
   <T>
@@ -280,7 +280,7 @@ letactor(
   send(tpactor, pr(tr, custactor))))))))
 \end{verbatim}
 \normalsize
-Recall that our semantics initializes the initial actor with the behavior of
+Recall that our semantics initializes the initial actor with the behavior of 
 executing the above lambda expression.
 Therefore after five \texttt{let}-expressions, the initial actor creates two 
 actors. One is the \texttt{tpactor} that calculates the tree product.
@@ -339,9 +339,7 @@ examples can be used to ensure that the semantics in K and the semantics
 from~\cite{} do not have any bugs. It can also be used to determine rule
 coverage, affirming that all semantic rules can be applied.
 
-Another area for future work inovlves extending
-
-Finally, an important area for future work involves taking advantage of K's
+Another important area for future work involves taking advantage of K's
 backend tools for formal analysis, such as proving actor programs correct using
 K's verification engine. For verification, K uses reachability logic~\cite{}, a
 language-independent formal verification framework. Reachability logic supports
@@ -349,6 +347,14 @@ all-path reachability, so it can be used to verify programs involving concurrent
 semantics. However, in order to fully take advantage of this verification, one
 would need to implement partial-order reduction in K in order to reduce the
 state space.
+
+Finally, we would also like to extend our semantics to allow interaction between
+actor systems by adding external actors and receptionists, as mentioned in
+Section~\ref{sec:configuration}. This would allow us to define more complicated
+programs, and it would also allow us to define programs like the tree product
+program more compactly. Additionally, it would allow us to begin asking
+questions regarding observational equivalence of actor systems, and perhaps even
+take advantage of K's analysis tools to prove such equivalences.
 
 %
 % ---- Bibliography ----
