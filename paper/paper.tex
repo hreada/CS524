@@ -91,7 +91,8 @@ formal analysis using the tools seen in Figure~\ref{fig:k-tools}.
 
 \section{The Actor Language in K}
 In this section, we describe in detail some important features of the actor
-language from~\cite{}. We cover some important features from K and how they were
+language from~\cite{actor}. We cover some important features from K and how 
+they were
 used to define key concepts of the actor language.
 
 \subsection{Configuration}
@@ -178,8 +179,146 @@ Strictness constructs like this avoid unnecessary syntactic sugar, and cleanly
 specify most reduction contexts one would require.
 
 \subsection{Semantics}\label{sec:semantics}
+Semantics in K is given as \emph{rewriting rules} of the form $l \Rightarrow r$.
+For example, the  beta-reduction rule (beta-v) is specified as
+\begin{verbatim}
+  rule app(lambda(X:Id, E:Exp), V:Val) => E [ V / X ]
+\end{verbatim}
+where \texttt{E [ V / X ]} is the result of substituting \texttt{V} for 
+\texttt{X} in \texttt{E} using K's internal substitution mechanism.
+Conditional reduction rules can also be easily specified.
+For example, the branching rule (br) is specified as two K rules
+\begin{verbatim}
+  rule br(nil, V1:Val, V2:Val) => V2
+  rule <k> br(V:Val, V1:Val, V2:Val) => V1 ... </k>
+       <definedaddr> X </definedaddr>
+    requires notBool((isId(V) andBool notBool(V in X)) orBool V ==K nil)
+\end{verbatim}
+The first rule says if the first argument is \texttt{nil}, the branching 
+operator \texttt{br} returns its third argument.
+The second rule is a bit complicated.
+It says if the first argument is neither \texttt{nil} nor 
+unknown addresses, the branching operator \texttt{br} returns its second 
+argument.
+
+The single-step transition relation $\mapsto$ on actor configurations is 
+similarly specified using K rules.
+For example, the \texttt{<init: a, a1>} transition rule is specified as
+\begin{verbatim}
+  rule <actor>
+         <k> initbeh(A1, V:Val) => nil ... </k>
+         <id> A </id>
+       </actor>
+       <actor>
+         <k> uninit(A) => ready(V) ... </k>
+         <id> A1 </id>
+       </actor>
+\end{verbatim}
+The rule involves two actors as there are two actor cells 
+\texttt{<actor>}\ \dots\ \texttt{</actor>} in the rule.
+The first actor is the \emph{initializer} actor while the second is the actor 
+\emph{being initialized}.
+K supports to only specify components that are relevant to the rule. This is 
+known as the \emph{framing principle}.
+The initializer actor executes \texttt{initbeh(A1, V:Val)} and gets value 
+\texttt{nil}, as specified in the rule.
+The rest computation or \emph{the reduction context} is unchanged and kept in 
+the following~``\texttt{...}''.
+
+Reduction context can be mentioned explicitly when needed.
+For example in the following \texttt{<bec: a, a1>} rule,
+\begin{verbatim}
+  rule <actor>
+         <k> (become(V:Val) ~> RestComputation) => ready(V) </k>
+         ...
+       </actor>
+       (.Bag => <actor>
+                  <k> nil ~> RestComputation </k>
+                  <id> !A1:Id </id>
+                </actor>)
+       <definedaddr> Ads => Ads ListItem(!A1) </definedaddr>
+\end{verbatim}
+the reduction context \texttt{RestComputation} is explicitly passed to a 
+newly-generated actor.
+The tilde arrow expression \verb|T ~> R| 
+means the decomposition \verb|R[T]| with reduction context \texttt{R} and redex 
+\texttt{T}.
 
 \subsection{In-depth Example}
+We test our actor semantics on an example of tree recursion~\cite{actor}.
+The problem is to calculate the product of all leaves of a binary tree.
+The problem is solved by a divide-and-conquer algorithm which calculates the 
+results for two subtrees and multiplies the results.
+The algorithm is implemented using a \emph{join continuation} as follows.
+\begin{verbatim}
+let(bind(sink,
+  rec(lambda(b, lambda(m, become(b))))),
+let(bind(ident,
+  lambda(m, m)),
+let(bind(joincont,
+  rec(lambda(b, lambda(c, lambda(nargs, lambda(firstnum, lambda(num,
+    if(eq?(nargs, 0),
+       become(app(app(app(b, c), 1), num)),
+       seq(become(sink),
+           send(c, mult(firstnum, num))))))))))),
+let(bind(treeprod,
+  rec(lambda(b, lambda(self, lambda(m,
+    seq(become(app(b, self)),
+        if(isnat(tree(m)),
+           send(cust(m), tree(m)),
+           letactor(bind(newcust, app(app(app(joincont, cust(m)), 0), nil)),
+             seq(send(self, pr(left(tree(m)), newcust)),
+                 send(self, pr(right(tree(m)), newcust))))))))))),
+let(bind(tr, 
+  pr(pr(1, pr(2, pr(3, 4))), pr(pr(5, 6), 7))),
+letactor(
+  bind(tpactor, app(treeprod, tpactor)),
+  bind(custactor, ident),
+  send(tpactor, pr(tr, custactor))))))))
+\end{verbatim}
+Remind that our semantics initializes the initial actor with the behavior of 
+executing the above lambda expression.
+Therefore after five \texttt{let}-expressions, the initial actor creates two 
+actors. One is the \texttt{tpactor} that calculates the tree product.
+The other is the \texttt{custactor} that receives the result.
+The initial actor sends \texttt{tpactor} a message containing a binary tree 
+whose leaves are $1, 2, \dots, 7$, and the address of the customer actor 
+\texttt{custactor}.
+When the actor system terminates, we get the following configuration
+\begin{verbatim}
+<T>
+  <actors>
+    <actor>
+      <k> ready ( ... ) </k>
+      <id> _93 </id>
+    </actor>
+    <actor>
+      <k> ready ( ... ) </k>
+      <id> _179 </id>
+    </actor>
+    .... ....
+    <actor>
+      <k> ready ( ... ) </k>
+      <id> _45 </id>
+    </actor>
+    <actor>
+      <k> exec ( nil ) </k>
+      <id> initactor </id>
+    </actor>
+    <actor>
+      <k> exec ( 5040 ) </k>
+      <id> _46 </id>
+    </actor>
+    ......
+    ......
+  </actors>
+  <messages> .MessageCellBag </messages>
+  <definedaddr> ... </definedaddr>
+</T>
+\end{verbatim}
+In the configuration there are many idle actors generated during the 
+computation. The customer actor, which in this execution has identity 
+\texttt{\_46}, is holding the final product of 5040.
 
 \section{Conclusion and Future Work}
 
