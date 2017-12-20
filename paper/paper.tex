@@ -76,7 +76,7 @@ more.
 Semantics of actor-based languages have been defined on paper, for example
 in~\cite{}. Additionally, there are many implementations of actor-based systems,
 including Erlang~\cite{}, Akka~\cite{}, Scheme~\cite{}, and much more. However,
-there is currently no formally defined \textit{executable} operational semantics
+there is currently no formally defined \emph{executable} operational semantics
 of an actor-based language. In K, there was previous work done to define the
 semantics of Orc, a concurrent programming language~\cite{}, though that work is
 incomplete.
@@ -192,7 +192,8 @@ For example, the branching rule (br) is specified as two K rules
   rule br(nil, V1:Val, V2:Val) => V2
   rule <k> br(V:Val, V1:Val, V2:Val) => V1 ... </k>
        <definedaddr> X </definedaddr>
-    requires notBool((isId(V) andBool notBool(V in X)) orBool V ==K nil)
+    requires notBool((isId(V) andBool notBool(V in X))
+                              orBool V ==K nil)
 \end{verbatim}
 The first rule says if the first argument is \texttt{nil}, the branching 
 operator \texttt{br} returns its third argument.
@@ -245,11 +246,13 @@ means the decomposition \verb|R[T]| with reduction context \texttt{R} and redex
 \texttt{T}.
 
 \subsection{In-depth Example}
-We test our actor semantics on an example of tree recursion~\cite{actor}.
-The problem is to calculate the product of all leaves of a binary tree.
-The problem is solved by a divide-and-conquer algorithm which calculates the 
-results for two subtrees and multiplies the results.
-The algorithm is implemented using a \emph{join continuation} as follows.
+We test our actor semantics on many examples. One of the more complicated test
+cases is an example of tree recursion~\cite{actor}.  The problem is to calculate
+the product of all leaves of a binary tree.  The problem is solved by a
+divide-and-conquer algorithm which calculates the results for two subtrees and
+multiplies the results.  The algorithm is implemented using a
+\emph{join continuation} as follows.
+\small
 \begin{verbatim}
 let(bind(sink,
   rec(lambda(b, lambda(m, become(b))))),
@@ -276,7 +279,8 @@ letactor(
   bind(custactor, ident),
   send(tpactor, pr(tr, custactor))))))))
 \end{verbatim}
-Remind that our semantics initializes the initial actor with the behavior of 
+\normalsize
+Recall that our semantics initializes the initial actor with the behavior of
 executing the above lambda expression.
 Therefore after five \texttt{let}-expressions, the initial actor creates two 
 actors. One is the \texttt{tpactor} that calculates the tree product.
