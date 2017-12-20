@@ -26,13 +26,13 @@
 \maketitle              % typeset the title of the contribution
 
 \begin{abstract}
-A simple reference actor language has been proposed in~\cite{}, serving as a
+A simple reference actor language has been proposed in~\cite{actor}, serving as a
 sound mathematical calculus foundation for various actor languages used in
 distributed applications that involves concurrency. Even though the authors
-of~\cite{} provided in the paper an operational semantics of the actor language,
+of~\cite{actor} provided in the paper an operational semantics of the actor language,
 an executable implementation was not given. In this project, we will give the
 reference actor language an implementation that by construction conforms to its
-formal operational semantics using the K framework~\cite{}, a rule-based
+formal operational semantics using the K framework~\cite{kframework}, a rule-based
 semantic framework. We will show that our executable formal semantics are
 capable of executing some meaningful actor systems examples. We hope our
 executable formal semantics can be served as a starting point for future work in
@@ -40,7 +40,7 @@ developing automatic equivalence provers using the K framework.
 \end{abstract}
 %
 \section{Introduction}
-The K framework~\cite{} is a framework for defining executable operational
+The K framework~\cite{kframework} is a framework for defining executable operational
 semantics of a programming language. K is based on rewriting logic, organizing
 the state of a program into cells and rewriting the particular parts of the
 configuration. K also has access the entire computation at any particular
@@ -66,7 +66,7 @@ discuss future work.
           \label{fig:k-tools}
 \end{figure}
 To demonstrate the power of K, languages as complex as C, Java, and JavaScript
-have been fully defined using the K framework~\cite{c,java,jscript}. On top of that, in
+have been fully defined using the K framework~\cite{kc,kjava,kjs}. On top of that, in
 all of these languages and more, nontrivial programs have been formally verified
 using K's prover, such as proofs involving AVL trees and red-black trees. We
 would like to add an actor-based language to the growing list of languages
@@ -74,15 +74,15 @@ defined in K, so we can take advantage of K's formal verification engine and
 more.
 
 Semantics of actor-based languages have been defined on paper, for example
-in~\cite{}. Additionally, there are many implementations of actor-based systems,
-including Erlang~\cite{}, Akka~\cite{}, Scheme~\cite{}, and much more. However,
+in~\cite{actor}. Additionally, there are many implementations of actor-based systems,
+including Erlang~\cite{erlang}, Akka~\cite{akka}, Scheme~\cite{scheme}, and much more. However,
 there is currently no formally defined \emph{executable} operational semantics
 of an actor-based language. In K, there was previous work done to define the
-semantics of Orc, a concurrent programming language~\cite{}, though that work is
+semantics of Orc, a concurrent programming language~\cite{orc}, though that work is
 incomplete.
 
 In this paper, we aim to define the semantics of the actor language proposed
-in~\cite{}.  We choose this language as the semantics are clearly defined in the
+in~\cite{actor}.  We choose this language as the semantics are clearly defined in the
 paper, and it is one of the more simple actor frameworks. Defining this language
 in K will give assurance to the correctness of the language - as K is executable
 this can be tested much easier than defining a language on paper. It will also
@@ -102,23 +102,23 @@ language, there may only be one cell to hold the current computation (the
 \texttt{<k>}\ \dots\ \texttt{</k>} cell) which is required for all languages
 defined in K. For the actor language, we have the following configuration:
 \begin{verbatim}
-configuration 
-  <T>
-    <actors>
-      <actor multiplicity="*">     // a multiset of actors
-        <k> exec($PGM:Exp) </k>    // actor state
-        <id> initactor </id>       // actor id
-      </actor>
-    </actors>
-    <messages>
-      <message  multiplicity="*">  // a multiset of messages
-        .K
-      </message>
-    </messages>
-    <definedaddr>                  // list of defined actors'
-      ListItem(initactor)          // addresses
-    </definedaddr>
-  </T>
+  configuration 
+    <T>
+      <actors>
+        <actor multiplicity="*">     // a multiset of actors
+          <k> exec($PGM:Exp) </k>    // actor state
+          <id> initactor </id>       // actor id
+        </actor>
+      </actors>
+      <messages>
+        <message  multiplicity="*">  // a multiset of messages
+          .K
+        </message>
+      </messages>
+      <definedaddr>                  // list of defined actors'
+        ListItem(initactor)          // addresses
+      </definedaddr>
+    </T>
 \end{verbatim}
 In addition to defining the state of a program, the configuration is also used
 to define the initial state of a program. Initially, we only have one actor,
@@ -159,21 +159,21 @@ $n$ arguments have already been evaluated. In K, this is simply specified using
 the attribute \texttt{seqstrict} which states the arguments of a syntactic
 construct are evaluated in order. Addition, for example, is specified in K as
 \begin{verbatim}
-syntax Exp ::= "add" "(" Exp "," Exp ")" [seqstrict]
+  syntax Exp ::= "add" "(" Exp "," Exp ")" [seqstrict]
 \end{verbatim}
 Note nothing beyond the appropriate strictness attribute is needed to specify
 reduction contexts in K for this language.
 
 For the branching, we would like to only specify that only the first argument
 should reduce to a value, to avoid reduction in the branch we end up not taking.
-In the actor semantics from~\cite{}, this is accomplished with the following:
+In the actor semantics from~\cite{actor}, this is accomplished with the following:
 \[ \texttt{if}(e_0, e_1, e_2) \;\;\;\text{abbreviates}\;\;\; \texttt{app}(\texttt{br}(e_0, \lambda z.e_1, \lambda z.e_2), \texttt{nil}) \;\;\;\text{for $z$ fresh} \]
 Notice that the second and third arguments in the branch construct are lambda
 expressions, which are values, and thus will not be reduced any farther. In our
 K semantics, we emulate this, but we could also define \texttt{br} directly to
 be only strict in the first argument as follows:
 \begin{verbatim}
-syntax Exp ::= "br" "(" Exp "," Exp "," Exp ")" [strict(1)]
+  syntax Exp ::= "br" "(" Exp "," Exp "," Exp ")" [strict(1)]
 \end{verbatim}
 Strictness constructs like this avoid unnecessary syntactic sugar, and cleanly
 specify most reduction contexts one would require.
@@ -290,35 +290,35 @@ whose leaves are $1, 2, \dots, 7$, and the address of the customer actor
 \texttt{custactor}.
 When the actor system terminates, we get the following configuration
 \begin{verbatim}
-<T>
-  <actors>
-    <actor>
-      <k> ready ( ... ) </k>
-      <id> _93 </id>
-    </actor>
-    <actor>
-      <k> ready ( ... ) </k>
-      <id> _179 </id>
-    </actor>
-    .... ....
-    <actor>
-      <k> ready ( ... ) </k>
-      <id> _45 </id>
-    </actor>
-    <actor>
-      <k> exec ( nil ) </k>
-      <id> initactor </id>
-    </actor>
-    <actor>
-      <k> exec ( 5040 ) </k>
-      <id> _46 </id>
-    </actor>
-    ......
-    ......
-  </actors>
-  <messages> .MessageCellBag </messages>
-  <definedaddr> ... </definedaddr>
-</T>
+  <T>
+    <actors>
+      <actor>
+        <k> ready ( ... ) </k>
+        <id> _93 </id>
+      </actor>
+      <actor>
+        <k> ready ( ... ) </k>
+        <id> _179 </id>
+      </actor>
+      .... ....
+      <actor>
+        <k> ready ( ... ) </k>
+        <id> _45 </id>
+      </actor>
+      <actor>
+        <k> exec ( nil ) </k>
+        <id> initactor </id>
+      </actor>
+      <actor>
+        <k> exec ( 5040 ) </k>
+        <id> _46 </id>
+      </actor>
+      ......
+      ......
+    </actors>
+    <messages> .MessageCellBag </messages>
+    <definedaddr> ... </definedaddr>
+  </T>
 \end{verbatim}
 In the configuration there are many idle actors generated during the 
 computation. The customer actor, which in this execution has identity 
@@ -326,22 +326,22 @@ computation. The customer actor, which in this execution has identity
 
 \section{Conclusion and Future Work}
 
-In this paper we showed how to define the actor semantics from~\cite{} using the
+In this paper we showed how to define the actor semantics from~\cite{actor} using the
 K framework. We described in detail the syntax and semantics of the language in
 K, as well as the configuration for our actor language. We also showed how we
 can use K's strictness attributes to emulate the reduction contexts described
-in~\cite{}. Finally, we discussed a complicated actor program, the tree product
+in~\cite{actor}. Finally, we discussed a complicated actor program, the tree product
 example, and its encoding in K.
 
 One immediate area for future work includes defining more actor programs and
 more in-depth actor programs in K. Having a large test suite of complicated
 examples can be used to ensure that the semantics in K and the semantics
-from~\cite{} do not have any bugs. It can also be used to determine rule
+from~\cite{actor} do not have any bugs. It can also be used to determine rule
 coverage, affirming that all semantic rules can be applied.
 
 Another important area for future work involves taking advantage of K's
 backend tools for formal analysis, such as proving actor programs correct using
-K's verification engine. For verification, K uses reachability logic~\cite{}, a
+K's verification engine. For verification, K uses reachability logic~\cite{reachabilitylogic}, a
 language-independent formal verification framework. Reachability logic supports
 all-path reachability, so it can be used to verify programs involving concurrent
 semantics. However, in order to fully take advantage of this verification, one
