@@ -21,7 +21,7 @@
 \author{Xiaohong Chen, Lucas Pe\~{n}a}
 %
 \institute{University of Illinois at Urbana-Champaign, \\
-\email{\{xc3, lpena7\}@illinios.edu}}
+\email{\{xc3,lpena7\}@illinios.edu}}
 
 \maketitle              % typeset the title of the contribution
 
@@ -58,12 +58,12 @@ discuss future work.
 \section{Related Work}
 
 \begin{figure}
-          \centering
-          \includegraphics[scale=0.13]{../k-overview.png}
-	  \caption{Backend tools K provides from just an operational
-            semantics. Some tools such as a semantics-based compiler and
-            test-case generation are in progress.}
-          \label{fig:k-tools}
+  \centering
+  \includegraphics[width=0.8\textwidth]{../k-overview.png}
+  \caption{Backend tools K provides from just an operational
+           semantics. Some tools such as a semantics-based compiler and
+           test-case generation are in progress.}
+  \label{fig:k-tools}
 \end{figure}
 To demonstrate the power of K, languages as complex as C, Java, and JavaScript
 have been fully defined using the K framework~\cite{kc,kjava,kjs}. On top of that, in
@@ -186,6 +186,9 @@ For example, the  beta-reduction rule (beta-v) is specified as
 \end{verbatim}
 where \texttt{E [ V / X ]} is the result of substituting \texttt{V} for 
 \texttt{X} in \texttt{E} using K's internal substitution mechanism.
+K rules start with the keyword \texttt{rule}. The left hand side of the rule 
+and right hand side of the rule are separated by a double arrow~``\texttt{=>}''.
+
 Conditional reduction rules can also be easily specified.
 For example, the branching rule (br) is specified as two K rules
 \begin{verbatim}
@@ -201,10 +204,13 @@ The second rule is a bit complicated.
 It says if the first argument is neither \texttt{nil} nor 
 unknown addresses, the branching operator \texttt{br} returns its second 
 argument.
+The \texttt{requires} keyword is used to specify rewriting conditions that 
+decide when a rewrite rule can be applied.
 
 The single-step transition relation $\mapsto$ on actor configurations is 
 similarly specified using K rules.
 For example, the \texttt{<init: a, a1>} transition rule is specified as
+\small
 \begin{verbatim}
   rule <actor>
          <k> initbeh(A1, V:Val) => nil ... </k>
@@ -215,6 +221,7 @@ For example, the \texttt{<init: a, a1>} transition rule is specified as
          <id> A1 </id>
        </actor>
 \end{verbatim}
+\normalsize
 The rule involves two actors as there are two actor cells 
 \texttt{<actor>}\ \dots\ \texttt{</actor>} in the rule.
 The first actor is the \emph{initializer} actor while the second is the actor 
@@ -223,11 +230,13 @@ K supports to only specify components that are relevant to the rule. This is
 known as the \emph{framing principle}.
 The initializer actor executes \texttt{initbeh(A1, V:Val)} and gets value 
 \texttt{nil}, as specified in the rule.
-The rest computation or \emph{the reduction context} is unchanged and kept in 
+The rest computation or so-called \emph{reduction context} is unchanged and 
+kept in 
 the following~``\texttt{...}''.
 
 Reduction context can be mentioned explicitly when needed.
-For example in the following \texttt{<bec: a, a1>} rule,
+For example, in the following \texttt{<bec: a, a1>} rule,
+\small
 \begin{verbatim}
   rule <actor>
          <k> (become(V:Val) ~> RestComputation) => ready(V) </k>
@@ -239,8 +248,9 @@ For example in the following \texttt{<bec: a, a1>} rule,
                 </actor>)
        <definedaddr> Ads => Ads ListItem(!A1) </definedaddr>
 \end{verbatim}
+\normalsize
 the reduction context \texttt{RestComputation} is explicitly passed to a 
-newly-generated actor.
+newly-generated actor with a fresh identity \verb|!A1|.
 The tilde arrow expression \verb|T ~> R| 
 means the decomposition \verb|R[T]| with reduction context \texttt{R} and redex 
 \texttt{T}.
@@ -280,15 +290,18 @@ letactor(
   send(tpactor, pr(tr, custactor))))))))
 \end{verbatim}
 \normalsize
+
 Recall that our semantics initializes the initial actor with the behavior of 
 executing the above lambda expression.
-Therefore after five \texttt{let}-expressions, the initial actor creates two 
+Therefore after five nested \texttt{let}-expressions, the initial actor creates 
+two 
 actors. One is the \texttt{tpactor} that calculates the tree product.
 The other is the \texttt{custactor} that receives the result.
 The initial actor sends \texttt{tpactor} a message containing a binary tree 
 whose leaves are $1, 2, \dots, 7$, and the address of the customer actor 
 \texttt{custactor}.
 When the actor system terminates, we get the following configuration
+\small
 \begin{verbatim}
   <T>
     <actors>
@@ -320,12 +333,13 @@ When the actor system terminates, we get the following configuration
     <definedaddr> ... </definedaddr>
   </T>
 \end{verbatim}
+\normalsize
 In the configuration there are many idle actors generated during the 
 computation. The customer actor, which in this execution has identity 
 \texttt{\_46}, is holding the final product of 5040.
 
 \section{Conclusion and Future Work}
-
+\label{sec:conclusion}
 In this paper we showed how to define the actor semantics from~\cite{actor} using the
 K framework. We described in detail the syntax and semantics of the language in
 K, as well as the configuration for our actor language. We also showed how we
