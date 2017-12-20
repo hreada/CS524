@@ -322,6 +322,30 @@ computation. The customer actor, which in this execution has identity
 
 \section{Conclusion and Future Work}
 
+In this paper we showed how to define the actor semantics from~\cite{} using the
+K framework. We described in detail the syntax and semantics of the language in
+K, as well as the configuration for our actor language. We also showed how we
+can use K's strictness attributes to emulate the reduction contexts described
+in~\cite{}. Finally, we discussed a complicated actor program, the tree product
+example, and its encoding in K.
+
+One immediate area for future work includes defining more actor programs and
+more in-depth actor programs in K. Having a large test suite of complicated
+examples can be used to ensure that the semantics in K and the semantics
+from~\cite{} do not have any bugs. It can also be used to determine rule
+coverage, affirming that all semantic rules can be applied.
+
+Another area for future work inovlves extending
+
+Finally, an important area for future work involves taking advantage of K's
+backend tools for formal analysis, such as proving actor programs correct using
+K's verification engine. For verification, K uses reachability logic~\cite{}, a
+language-independent formal verification framework. Reachability logic supports
+all-path reachability, so it can be used to verify programs involving concurrent
+semantics. However, in order to fully take advantage of this verification, one
+would need to implement partial-order reduction in K in order to reduce the
+state space.
+
 %
 % ---- Bibliography ----
 %
