@@ -11,7 +11,7 @@
 
 ### Verification
 
-- See `verification` directory.
+- Navigate to the `verification` directory.
 - Simple addition example can be run using the command
 ```
 krun --debug --directory ../src --prove equality_spec.k --z3-executable dummy.actor
