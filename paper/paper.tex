@@ -201,8 +201,8 @@ For example, the branching rule (br) is specified as two K rules
 The first rule says if the first argument is \texttt{nil}, the branching 
 operator \texttt{br} returns its third argument.
 The second rule is a bit complicated.
-It says if the first argument is neither \texttt{nil} nor 
-unknown addresses, the branching operator \texttt{br} returns its second 
+It says if the first argument is neither \texttt{nil} nor an
+unknown address, the branching operator \texttt{br} returns its second
 argument.
 The \texttt{requires} keyword is used to specify rewriting conditions that 
 decide when a rewrite rule can be applied.
@@ -230,11 +230,11 @@ K supports to only specify components that are relevant to the rule. This is
 known as the \emph{framing principle}.
 The initializer actor executes \texttt{initbeh(A1, V:Val)} and gets value 
 \texttt{nil}, as specified in the rule.
-The rest computation or so-called \emph{reduction context} is unchanged and 
+The rest of the computation or so-called \emph{reduction context} is unchanged and
 kept in 
 the following~``\texttt{...}''.
 
-Reduction context can be mentioned explicitly when needed.
+Reduction contexts can be mentioned explicitly when needed.
 For example, in the following \texttt{<bec: a, a1>} rule,
 \small
 \begin{verbatim}
