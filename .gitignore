@@ -1,1 +1,6 @@
 *-kompiled/
+*.aux
+*.blg
+*.bbl
+*.log
+*.pdf
