@@ -9,6 +9,11 @@
 - Run the command `./exec_all.sh` to run all files in the `test` directory.
 - Run the command`./test_all.sh` to run all files in the `test` directory, and check output against `.out` files.
 
+### Paper
+
+- Navigate to the `paper` directory.
+- Run `make`, and open `paper.pdf`.
+
 ### Verification
 
 - Navigate to the `verification` directory.
